@@ -6,8 +6,7 @@ toc: true
 
 This article was originally published as a gist [here](https://gist.github.com/bkaradzic/853fd21a15542e0ec96f7268150f1b62).
 
-Prerequisites
--------------
+## Prerequisites
 
 Before you continue, if you don't know what IMGUI is don't bother reading this post, just ignore it, don't write anything in comments section, etc. If you're curious about IMGUI see [bottom](https://gist.github.com/bkaradzic/853fd21a15542e0ec96f7268150f1b62#extra) of this post, otherwise continue whatever you were doing, this post it's not for you. Thanks!
 
@@ -24,8 +23,7 @@ If you know what IMGUI is, for context read following presentations and blog pos
 
 The last link is not related to anything below but it's part of discussion above, putting it here just for people who are interested to see all opinions.
 
-Disclaimers
------------
+## Disclaimers
 
  - I used extensively Qt in the past, I consider it to be one of the best designed C++ project, their documentation is amazing, there is huge community, etc. There is really nothing I dislike about it (not even moc'ing). All my experience with Qt is pre-version 5.0, but I don't think much changed about C++ side since they were focused to mobile and declarative UI side of things.
 
@@ -39,8 +37,7 @@ Disclaimers
 
  - For gullible: Unity is doing it, they all the rage now, they make $$$, obviously you can attribute all of their success to decision to use IMGUI, End Of Discussion. See docs here: https://docs.unity3d.com/Manual/GUIScriptingGuide.html :)
 
-Introduction
-------------
+## Introduction
 
 I never used Web Browser for building tools. I was curious when Insomniac announced their switch to web tech for tools. But Java Script always looked jenky to me for anything serious. To be honest, I think this about any interpreted code. ;) At the time I was hopping Native Client (NaCl) would take of and it would be fine to write tools in C++ and run them inside Web Browser. I shipped one game for NaCl, and that worked pretty well, but NaCl didn't really take of. Their postmortem explains in details why using web tech is bad if you only have C++ programmers working on it.
 
@@ -48,8 +45,7 @@ I used IMGUI style widgets for a long time. Most of use cases were for debugging
 
 Most of GameDev companies pick existing framework like Qt, WPF, etc. because they can get programmers productive ASAP, they don't need to ship tools on platforms other than Windows (which in case of Qt is not a problem, but it is in case of WPF). The reason why Unity didn't go this route is **probably** (guessing here) because at the time Qt wasn't licensed under LGPL (it was dual GPL / commercial license with $2K fee per programmer seat), and there wasn't any other viable cross platform solution for GUI, and they wanted to support OSX & Windows. Considering this, and ignoring Unity's case, it's pretty obvious route to choose existing framework from productivity point of view of manager or producer.
 
-That all sounds good, what's wrong with it?
--------------------------------------------
+## That all sounds good, what's wrong with it?
 
 What is not obvious frameworks usually come with extra knowledge requirements of knowing how to use them, which makes person that knows it efficient, and person that doesn't know it very inefficient. People usually trivialize this with C# in the same way as they do with JavaScript, like everyone knows it, documentation is everywhere, etc. But that's not true, and C# requires people who spent enough time with to know it well. Just it appears that way because land mines in C# like in JavaScript are harder to trigger unlike in C++. Even if early on team is not split into two groups of those that know framework and those that don't, editor and engine teams, eventually there will be clear who knows more UI framework, and who knows more engine side... Which leads to another problem, person that knows the most about the system is not making the editor for it. In many cases this might not be huge issue, but it becomes major bottleneck for tools that require domain specific knowledge. When it comes to team, ideally whoever writes engine feature is also responsible for editor side of things, integration with world editor, user facing features, etc. Editor team with IMGUI could be much smaller and someone who provides editor infrastructure, undo-redo, load/save, docking, etc. not someone who writes specific editors.
 
@@ -59,8 +55,7 @@ Frameworks in general mean you don't embed framework to your engine, you embed y
 
 Large frameworks have tendency that require large teams to support them. I lost count how many times Qt changed owner in last 10 years (Trolltech, Nokia, Digia, a few more?). Every time this happens you have to worry what new owner might do with it. You wonder is it going to be supported? Are they going to drop classic desktop widgets support and focus only on QtQuick in 2-3 years from now? With framework like WPF is the same, MS could just quietly stop working after some massive layoff and let it decay unsupported. MS is also famous for this hype-hype-then-abandon cycle for their frameworks (XNA, Silverlight, and others). Even if both companies drop everything on GitHub with permissive license on it, both code bases are massive and require huge investment to keep maintaining it and moving forward. IMGUI is simple enough that even small GameDev team could take control over it in case that original author decides they are done with it.
 
-What IMGUI lacks?
------------------
+## What IMGUI lacks?
 
 As I said above utilities that come from frameworks are really huge boost in beginning. Nowadays is possible to use Qt's core library without the rest of Qt, so that might be good pick for anyone who doesn't have good base cross platform library.
 
@@ -92,8 +87,7 @@ https://github.com/ocornut/imgui/issues/973
 https://github.com/ocornut/imgui/issues/1269  
 https://github.com/ocornut/imgui/issues/1607  
 
-Summary
--------
+## Summary
 
 To summarize why I think Immediate Mode GUI is way to go for GameDev tools:
  - IMGUI is great for writing custom controls which are majority of controls you need anyway, but it comes with basic controls that big frameworks offer too.
@@ -102,8 +96,7 @@ To summarize why I think Immediate Mode GUI is way to go for GameDev tools:
 
 My prediction is that in a few years Insomniac's tools team will come up with another GDC postmortem explaining what's wrong with Qt, and why they switched from Qt to IMGUI. I'm just joking here, but you never know... :)
 
-Extra
------
+## Extra
 
  - Immediate-Mode Graphical User Interfaces  
    https://web.archive.org/web/20190130051359/https://caseymuratori.com/blog_0001
