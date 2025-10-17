@@ -10,6 +10,8 @@ defaultContentLanguage = "en-us"
 # Enable emojis globally
 enableEmoji = true
 
+publishDir = 'docs'
+
 theme = "hugo-blog-awesome"
 
 # set markup.highlight.noClasses=false to enable code highlight
@@ -60,10 +62,15 @@ url = "/index.xml"
     url = '/posts/'
     weight = 20
   [[Languages.en-us.menu.main]]
+    pageRef="docs"
+    name = 'Docs'
+    url = 'https://bkaradzic.github.io/bgfx/'
+    weight = 30
+  [[Languages.en-us.menu.main]]
     pageRef="about"
     name = 'About'
     url = '/about/'
-    weight = 30
+    weight = 40
 
 [Languages.en-us.params]
   defaultColor = "auto" # set color mode: dark, light, auto

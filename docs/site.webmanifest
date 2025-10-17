@@ -1,7 +1,7 @@
 {
     "name": "Branimir Karadžić's Home Page",
     "short_name": "Branimir Karadžić's Home Page",
-    "start_url": "http://localhost:1313/",
+    "start_url": "https://bkaradzic.github.io/",
     "theme_color": "#434648",
     "background_color": "#ffffff",
     "display": "standalone",
