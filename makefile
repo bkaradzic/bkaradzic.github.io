@@ -3,6 +3,7 @@ all: clean
 
 clean:
 	-rm -rf public
+	-rm -rf resources
 	-rm -rf themes/hugo-blog-awesome/.git
 	-rm -rf themes/hugo-blog-awesome/.github
 	-rm -rf themes/hugo-blog-awesome/exampleSite
