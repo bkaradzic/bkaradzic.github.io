@@ -1,0 +1,82 @@
+title = "Branimir Karadžić's Home Page"
+baseURL = 'https://bkaradzic.github.io/'
+
+# This is what goes in <html lang="">
+languageCode = 'en-us'
+
+# This defines how dates are formatted
+defaultContentLanguage = "en-us"
+
+# Enable emojis globally
+enableEmoji = true
+
+theme = "hugo-blog-awesome"
+
+# set markup.highlight.noClasses=false to enable code highlight
+[markup]
+  [markup.highlight]
+    noClasses = false
+    lineNos = true
+    lineNumbersInTable = false
+  [markup.goldmark.renderer]
+  unsafe = true
+
+[params]
+  goToTop = true
+
+[[params.socialIcons]]
+name = "github"
+url = "https://github.com/bkaradzic"
+
+[[params.socialIcons]]
+name = "X"
+url = "https://x.com/bkaradzic"
+
+[[params.socialIcons]]
+name = "Rss"
+url = "/index.xml"
+
+[Languages.en-us]
+  languageName = "English"
+  languageCode = "en-us"
+  contentDir = "content/en"
+  weight = 1
+
+  [Languages.en-us.menu]
+  [[Languages.en-us.menu.main]]
+    # The page reference (pageRef) is useful for menu highlighting
+    # When pageRef is set, setting `url` is optional; it will be used as a fallback if the page is not found.
+    pageRef="/"
+    name = 'Home'
+    url = '/'
+    weight = 10
+  [[Languages.en-us.menu.main]]
+    pageRef="posts"
+    name = 'Posts'
+    url = '/posts/'
+    weight = 20
+  [[Languages.en-us.menu.main]]
+    pageRef="about"
+    name = 'About'
+    url = '/about/'
+    weight = 30
+
+[Languages.en-us.params]
+  defaultColor = "auto" # set color mode: dark, light, auto
+  description = ""
+  mainSections = ['posts']
+  toc = false # set to false to disable table of contents 'globally'
+  tocOpen = false # set to true to open table of contents by default
+  goToTop = true # set to false to disable 'go to top' button
+  dateFormat = "2006-01-02" # date format used to show dates on various pages. If nothing is specified, then "2 Jan 2006" format is used.
+  # See https://gohugo.io/functions/time/format/ for available date formats.
+  rssFeedDescription = "summary" # available options: 1) summary 2) full
+  # summary - includes a short summary of the blog post in the RSS feed. Generated using Hugo .Summary .
+  # full - includes full blog post in the RSS feed. Generated using Hugo .Content .
+  # By default (or if nothing is specified), summary is used.
+
+[Languages.en-us.params.author]
+  avatar = "avatar.jpg"
+  intro = "Branimir Karadžić"
+  name = "Branimir Karadžić"
+  description = "coder (gamedev, open source, ex-demoscene) 🍀 author of bgfx open source rendering library"
