@@ -66,7 +66,7 @@ url = "/index.xml"
   description = ""
   mainSections = ['posts']
   toc = false # set to false to disable table of contents 'globally'
-  tocOpen = false # set to true to open table of contents by default
+  tocOpen = true # set to true to open table of contents by default
   goToTop = true # set to false to disable 'go to top' button
   dateFormat = "2006-01-02" # date format used to show dates on various pages. If nothing is specified, then "2 Jan 2006" format is used.
   # See https://gohugo.io/functions/time/format/ for available date formats.
