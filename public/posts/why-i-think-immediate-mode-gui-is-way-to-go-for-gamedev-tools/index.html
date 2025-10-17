@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Why I think Immediate Mode GUI is way to go for GameDev tools | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Why I think Immediate Mode GUI is way to go for GameDev tools | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Why I think Immediate Mode GUI is way to go for GameDev tools | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Why I think Immediate Mode GUI is way to go for GameDev tools | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Why I think Immediate Mode GUI is way to go for GameDev tools | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="">
+<meta itemprop="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2017-03-06T00:00:00Z />
+    <meta property="article:published_time" content=2017-03-06T00:00:00Z />
+    <meta property="og:url" content="http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Why I think Immediate Mode GUI is way to go for GameDev tools",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2017-03-06",
+        "description": "",
+        "wordCount":  1875 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2017-03-06",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Why I think Immediate Mode GUI is way to go for GameDev tools" />
+<meta property="og:description" content="This article was originally published as a gist here.
+Prerequisites Before you continue, if you don&rsquo;t know what IMGUI is don&rsquo;t bother reading this post, just ignore it, don&rsquo;t write anything in comments section, etc. If you&rsquo;re curious about IMGUI see bottom of this post, otherwise continue whatever you were doing, this post it&rsquo;s not for you. Thanks!
+If you know what IMGUI is, for context read following presentations and blog posts:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2017-03-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-03-06T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Why I think Immediate Mode GUI is way to go for GameDev tools"/>
+<meta name="twitter:description" content="This article was originally published as a gist here.
+Prerequisites Before you continue, if you don&rsquo;t know what IMGUI is don&rsquo;t bother reading this post, just ignore it, don&rsquo;t write anything in comments section, etc. If you&rsquo;re curious about IMGUI see bottom of this post, otherwise continue whatever you were doing, this post it&rsquo;s not for you. Thanks!
+If you know what IMGUI is, for context read following presentations and blog posts:"/>
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/">
+    <link href="/style.min.c0bb708cea238e476644e7743fe25ba61a3e8f2b534f5dd1d57e843c68e62c7d.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/about/">
+                        About
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Why I think Immediate Mode GUI is way to go for GameDev tools</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2017-03-06T00:00:00&#43;00:00" itemprop="datePublished"> 2017-03-06 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#disclaimers">Disclaimers</a></li>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#that-all-sounds-good-whats-wrong-with-it">That all sounds good, what&rsquo;s wrong with it?</a></li>
+    <li><a href="#what-imgui-lacks">What IMGUI lacks?</a></li>
+    <li><a href="#examples">Examples</a></li>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#extra">Extra</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <p>This article was originally published as a gist <a href="https://gist.github.com/bkaradzic/853fd21a15542e0ec96f7268150f1b62">here</a>.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before you continue, if you don&rsquo;t know what IMGUI is don&rsquo;t bother reading this post, just ignore it, don&rsquo;t write anything in comments section, etc. If you&rsquo;re curious about IMGUI see <a href="https://gist.github.com/bkaradzic/853fd21a15542e0ec96f7268150f1b62#extra">bottom</a> of this post, otherwise continue whatever you were doing, this post it&rsquo;s not for you. Thanks!</p>
+<p>If you know what IMGUI is, for context read following presentations and blog posts:</p>
+<ul>
+<li>
+<p>Insomniac’s Web Tools Postmortem<br>
+<a href="https://web.archive.org/web/20170501000000/https://deplinenoise.wordpress.com/2017/03/03/slides-insomniacs-web-tools-postmortem/">https://web.archive.org/web/20170501000000/https://deplinenoise.wordpress.com/2017/03/03/slides-insomniacs-web-tools-postmortem/</a></p>
+</li>
+<li>
+<p>Why Qt and not IMGUI?<br>
+<a href="https://web.archive.org/web/20170317000640/https://deplinenoise.wordpress.com/2017/03/05/why-qt-and-not-imgui/">https://web.archive.org/web/20170317000640/https://deplinenoise.wordpress.com/2017/03/05/why-qt-and-not-imgui/</a></p>
+</li>
+<li>
+<p>Web Tools for Application UI<br>
+<a href="https://web.archive.org/web/20210124071004/https://stoyannk.wordpress.com/2017/03/03/web-tools-for-application-ui/">https://web.archive.org/web/20210124071004/https://stoyannk.wordpress.com/2017/03/03/web-tools-for-application-ui/</a></p>
+</li>
+</ul>
+<p>The last link is not related to anything below but it&rsquo;s part of discussion above, putting it here just for people who are interested to see all opinions.</p>
+<h2 id="disclaimers">Disclaimers</h2>
+<ul>
+<li>
+<p>I used extensively Qt in the past, I consider it to be one of the best designed C++ project, their documentation is amazing, there is huge community, etc. There is really nothing I dislike about it (not even moc&rsquo;ing). All my experience with Qt is pre-version 5.0, but I don&rsquo;t think much changed about C++ side since they were focused to mobile and declarative UI side of things.</p>
+</li>
+<li>
+<p>This post is not direct answer to Andreas, nor critique of their decision to use Qt, just my opinion why I think IMGUI is more suitable for GameDev tools.</p>
+</li>
+<li>
+<p>When I say Qt below, I mean any traditional GUI library, like wxWidgets, WPF, etc.</p>
+</li>
+<li>
+<p>When I say IMGUI, I mean <a href="https://github.com/ocornut/imgui">dear-imgui</a> since it&rsquo;s most popular one, but it could apply to any IMGUI library.</p>
+</li>
+<li>
+<p>This is post only about <strong>tools UI</strong>, not game UI. I don&rsquo;t think those should be unified since constraints and requirements are completely different. I&rsquo;m gonna keep writing <strong>tools UI</strong> in bold, because there will be always someone to ask what about game UI (it&rsquo;s <strong>NOT</strong> part of consideration here).</p>
+</li>
+<li>
+<p>For gullible: Unity is doing it, they all the rage now, they make $$$, obviously you can attribute all of their success to decision to use IMGUI, End Of Discussion. See docs here: <a href="https://docs.unity3d.com/Manual/GUIScriptingGuide.html">https://docs.unity3d.com/Manual/GUIScriptingGuide.html</a> :)</p>
+</li>
+</ul>
+<h2 id="introduction">Introduction</h2>
+<p>I never used Web Browser for building tools. I was curious when Insomniac announced their switch to web tech for tools. But Java Script always looked jenky to me for anything serious. To be honest, I think this about any interpreted code. ;) At the time I was hopping Native Client (NaCl) would take of and it would be fine to write tools in C++ and run them inside Web Browser. I shipped one game for NaCl, and that worked pretty well, but NaCl didn&rsquo;t really take of. Their postmortem explains in details why using web tech is bad if you only have C++ programmers working on it.</p>
+<p>I used IMGUI style widgets for a long time. Most of use cases were for debugging or tweaking parameters in simple examples. Before I never considered it seriously for GameDev tools like world editor. When using Qt and similar frameworks there is a lot of utilities that come with it, but are unrelated to GUI widgets itself. IMGUIs traditionally don&rsquo;t have that part, and represent only widgets itself. For example, by just using Qt framework you get <a href="https://doc.qt.io/qt-4.8/qdir.html">QDir</a> or <a href="https://doc.qt.io/qt-4.8/qfileinfo.html">QFileInfo</a> out of box. With IMGUI there is nothing like that, which usually mean you need to write your own, and it causes huge slow down early on.</p>
+<p>Most of GameDev companies pick existing framework like Qt, WPF, etc. because they can get programmers productive ASAP, they don&rsquo;t need to ship tools on platforms other than Windows (which in case of Qt is not a problem, but it is in case of WPF). The reason why Unity didn&rsquo;t go this route is <strong>probably</strong> (guessing here) because at the time Qt wasn&rsquo;t licensed under LGPL (it was dual GPL / commercial license with $2K fee per programmer seat), and there wasn&rsquo;t any other viable cross platform solution for GUI, and they wanted to support OSX &amp; Windows. Considering this, and ignoring Unity&rsquo;s case, it&rsquo;s pretty obvious route to choose existing framework from productivity point of view of manager or producer.</p>
+<h2 id="that-all-sounds-good-whats-wrong-with-it">That all sounds good, what&rsquo;s wrong with it?</h2>
+<p>What is not obvious frameworks usually come with extra knowledge requirements of knowing how to use them, which makes person that knows it efficient, and person that doesn&rsquo;t know it very inefficient. People usually trivialize this with C# in the same way as they do with JavaScript, like everyone knows it, documentation is everywhere, etc. But that&rsquo;s not true, and C# requires people who spent enough time with to know it well. Just it appears that way because land mines in C# like in JavaScript are harder to trigger unlike in C++. Even if early on team is not split into two groups of those that know framework and those that don&rsquo;t, editor and engine teams, eventually there will be clear who knows more UI framework, and who knows more engine side&hellip; Which leads to another problem, person that knows the most about the system is not making the editor for it. In many cases this might not be huge issue, but it becomes major bottleneck for tools that require domain specific knowledge. When it comes to team, ideally whoever writes engine feature is also responsible for editor side of things, integration with world editor, user facing features, etc. Editor team with IMGUI could be much smaller and someone who provides editor infrastructure, undo-redo, load/save, docking, etc. not someone who writes specific editors.</p>
+<p>If you used any framework before, and if you look pages 56-65 from Insomniac&rsquo;s <a href="https://deplinenoise.files.wordpress.com/2017/03/webtoolspostmortem.pdf#page=56">slide deck</a>, you&rsquo;ll realize that not many of those widgets are possible out of box. Most of them are custom widgets, or views of data that&rsquo;s also very engine specific. Custom widgets in Qt get really complicated pretty quick. If data is tree/list you could use QTreeView create delegates hook signals, etc. But when it gets really complicated you have to render it as QScrollArea or QPixmap. This is actually part where IMGUI is the strongest and why I feel it&rsquo;s ideal for writing GameDev tools. Code for custom widgets in IMGUI has hardware acceleration, you&rsquo;re not drawing pixel-by-pixel and blitting. Code for doing this with IMGUI is much more simple, and familiar to anyone working on the game. Just to illustrate this, here are hex editor widgets written in Qt <a href="https://github.com/Simsys/qhexedit2">qhexedit2</a>, <a href="https://github.com/Dax89/QHexEdit">QHexEdit</a>, there are million of these hex editors written in Qt you can search it. Then use that Qt code and compare it with hex editor written with dear-imgui <a href="https://gist.github.com/ocornut/0673e37e54aff644298b">https://gist.github.com/ocornut/0673e37e54aff644298b</a>. Simpler? IMGUI widgets are highly interactive, everything can be updated every frame, with traditional UI framework this could be huge performance penalty since it&rsquo;s more traditional static UI solution.</p>
+<p>Frameworks in general mean you don&rsquo;t embed framework to your engine, you embed your engine to theirs framework. Which complicates a lot of things, since engine is also framework itself. There are workarounds, grabbing window handle using it from other process, or using shared memory, or any other way of IPC, etc. But with IMGUI it&rsquo;s already in your engine, no need to figure out how to interop between renderer that your engine is using and framework&rsquo;s rendering API is using underneath.</p>
+<p>Large frameworks have tendency that require large teams to support them. I lost count how many times Qt changed owner in last 10 years (Trolltech, Nokia, Digia, a few more?). Every time this happens you have to worry what new owner might do with it. You wonder is it going to be supported? Are they going to drop classic desktop widgets support and focus only on QtQuick in 2-3 years from now? With framework like WPF is the same, MS could just quietly stop working after some massive layoff and let it decay unsupported. MS is also famous for this hype-hype-then-abandon cycle for their frameworks (XNA, Silverlight, and others). Even if both companies drop everything on GitHub with permissive license on it, both code bases are massive and require huge investment to keep maintaining it and moving forward. IMGUI is simple enough that even small GameDev team could take control over it in case that original author decides they are done with it.</p>
+<h2 id="what-imgui-lacks">What IMGUI lacks?</h2>
+<p>As I said above utilities that come from frameworks are really huge boost in beginning. Nowadays is possible to use Qt&rsquo;s core library without the rest of Qt, so that might be good pick for anyone who doesn&rsquo;t have good base cross platform library.</p>
+<p>All IMGUI libraries, that I know of, don&rsquo;t have well developed system for users to contribute their extensions to library. In Qt you could write very complex widgets, share it, without needing to change library or that Qt code knows anything about extension. The most popular IMGUI library dear-imgui has way to submit link to repo that contains extensions, new widgets, etc. but usually code doesn&rsquo;t conform to dear-imgui&rsquo;s standard, dependencies users choose are sometimes insane, and overall it&rsquo;s not easy way to integrate extensions with existing code. Or simply some people don&rsquo;t even choose to contribute anything back, because there is no easy obvious way to do it. This all could be solved with some more structured way of contributing to dear-imgui extensions.</p>
+<p>IMGUI power usage is not good for mobile devices since it redraws whole screen all the time, that might be a problem and it could be solved, but we&rsquo;re talking here about GameDev <strong>tools UI</strong>, and my assumption is that GameDev tools are run on desktop PC.</p>
+<p>IMGUI doesn&rsquo;t have native internationalization support, but your game should have that anyway, so you could use that system instead relying on frameworks for localization for tools and your own for game. Also if you&rsquo;re doing only internal company <strong>tools UI</strong> it&rsquo;s feasible to completely ignore localization, and just use the most common language company employees are using.</p>
+<h2 id="examples">Examples</h2>
+<p>Here are few screenshots of GameDev tools made with IMGUI:</p>
+<p><img alt="0" src="https://cloud.githubusercontent.com/assets/814772/17825130/ee09ace8-661a-11e6-80b5-c315fa4eaaa6.png">
+<img alt="1" src="https://cloud.githubusercontent.com/assets/153526/17481789/18b71916-5d7f-11e6-9726-9e17dec1f3b4.png">
+<img alt="2" src="https://cloud.githubusercontent.com/assets/1499411/22198936/6a085efe-e161-11e6-8d76-3ba179e7c76b.png">
+<img alt="3" src="https://cloud.githubusercontent.com/assets/8225057/20628927/33e14cac-b329-11e6-80f6-9524e93b048a.png">
+<img alt="4" src="https://cloud.githubusercontent.com/assets/8225057/21047677/7b667d80-be0b-11e6-80c5-80e9055310c8.jpg">
+<img alt="5" src="https://cloud.githubusercontent.com/assets/12642134/21346800/3c188ee0-c6a6-11e6-980f-05fadcc30b99.jpg">
+<img alt="6" src="https://camo.githubusercontent.com/3c42dabb202ee7169eca05a9c858439f0414093b/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4553525a696835576f4163447446393f666f726d61743d6a7067266e616d653d6c61726765">
+<img alt="7" src="https://camo.githubusercontent.com/16cb436299b323f22d78899ffd97acc8ce8f1299/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4553525a69683558304141654e78303f666f726d61743d6a7067266e616d653d6c61726765"></p>
+<p>See other IMGUI screenshots here:<br>
+<a href="https://github.com/ocornut/imgui/issues/123">https://github.com/ocornut/imgui/issues/123</a><br>
+<a href="https://github.com/ocornut/imgui/issues/539">https://github.com/ocornut/imgui/issues/539</a><br>
+<a href="https://github.com/ocornut/imgui/issues/772">https://github.com/ocornut/imgui/issues/772</a><br>
+<a href="https://github.com/ocornut/imgui/issues/973">https://github.com/ocornut/imgui/issues/973</a><br>
+<a href="https://github.com/ocornut/imgui/issues/1269">https://github.com/ocornut/imgui/issues/1269</a><br>
+<a href="https://github.com/ocornut/imgui/issues/1607">https://github.com/ocornut/imgui/issues/1607</a></p>
+<h2 id="summary">Summary</h2>
+<p>To summarize why I think Immediate Mode GUI is way to go for GameDev tools:</p>
+<ul>
+<li>IMGUI is great for writing custom controls which are majority of controls you need anyway, but it comes with basic controls that big frameworks offer too.</li>
+<li>IMGUI doesn&rsquo;t require domain specific knowledge of framework and it makes every programmer effective creating editors and tools to support their engine features.</li>
+<li>IMGUI is simple enough that in case of abandonment by original author can be taken over trivially even by small team.</li>
+</ul>
+<p>My prediction is that in a few years Insomniac&rsquo;s tools team will come up with another GDC postmortem explaining what&rsquo;s wrong with Qt, and why they switched from Qt to IMGUI. I&rsquo;m just joking here, but you never know&hellip; :)</p>
+<h2 id="extra">Extra</h2>
+<ul>
+<li>
+<p>Immediate-Mode Graphical User Interfaces<br>
+<a href="https://web.archive.org/web/20190130051359/https://caseymuratori.com/blog_0001">https://web.archive.org/web/20190130051359/https://caseymuratori.com/blog_0001</a></p>
+</li>
+<li>
+<p>IMGUI tutorial<br>
+<a href="https://web.archive.org/web/20190130051340/http://sol.gfxile.net/imgui/">https://web.archive.org/web/20190130051340/http://sol.gfxile.net/imgui/</a></p>
+</li>
+<li>
+<p>Author of LumixEngine lists pros/cons after switching from Qt to IMGUI:<br>
+<a href="https://github.com/ocornut/imgui/issues/123#issuecomment-142700775">https://github.com/ocornut/imgui/issues/123#issuecomment-142700775</a></p>
+</li>
+<li>
+<p>One Draw Call UI<br>
+<a href="https://web.archive.org/web/20190130051421/https://ourmachinery.com/post/one-draw-call-ui/">https://web.archive.org/web/20190130051421/https://ourmachinery.com/post/one-draw-call-ui/</a></p>
+</li>
+<li>
+<p>Rethinking UI APIs<br>
+<a href="https://web.archive.org/web/20190130051320/https://games.greggman.com/game/rethinking-ui-apis/">https://web.archive.org/web/20190130051320/https://games.greggman.com/game/rethinking-ui-apis/</a></p>
+</li>
+<li>
+<p>Announcement of Graphite (research platform for computer graphics, 3D modeling and numerical geometry) switching from Qt to IMGUI<br>
+<a href="https://twitter.com/BrunoLevy01/status/956653527597764611">https://twitter.com/BrunoLevy01/status/956653527597764611</a></p>
+</li>
+<li>
+<p>Could ImGUI be the future of GUIs?<br>
+<a href="https://web.archive.org/web/20190130051241/https://games.greggman.com/game/imgui-future/">https://web.archive.org/web/20190130051241/https://games.greggman.com/game/imgui-future/</a></p>
+</li>
+<li>
+<p>Micha Mettke - internal immediate mode UI game engine editor<br>
+<a href="https://twitter.com/MichaMettke/status/1235213089026576384">https://twitter.com/MichaMettke/status/1235213089026576384</a></p>
+<blockquote>
+<p>Some advantages were instant onboarding of team into UI programming and 1/3 in code size compared to old Qt code.</p>
+</blockquote>
+</li>
+<li>
+<p>GDC 2020 - Writing Tools Faster - Niklas Gray<br>
+<a href="https://web.archive.org/web/20200317004259/https://ourmachinery.com/writing-tools-faster.html">https://web.archive.org/web/20200317004259/https://ourmachinery.com/writing-tools-faster.html</a></p>
+</li>
+</ul>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2025 Branimir Karadžić.
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

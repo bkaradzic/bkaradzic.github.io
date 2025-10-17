@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Orthodox C&#43;&#43; | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Orthodox C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Orthodox C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Orthodox C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Orthodox C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="">
+<meta itemprop="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="http://localhost:1313/posts/orthodoxc&#43;&#43;/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2016-01-16T00:00:00Z />
+    <meta property="article:published_time" content=2016-01-16T00:00:00Z />
+    <meta property="og:url" content="http://localhost:1313/posts/orthodoxc&#43;&#43;/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Orthodox C++",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2016-01-16",
+        "description": "",
+        "wordCount":  736 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2016-01-16",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Orthodox C&#43;&#43;" />
+<meta property="og:description" content="This article was originally published as a gist here.
+What is Orthodox C&#43;&#43;? Orthodox C&#43;&#43; (sometimes referred as C&#43;) is minimal subset of C&#43;&#43; that improves C, but avoids all unnecessary things from so called Modern C&#43;&#43;. It&rsquo;s exactly opposite of what Modern C&#43;&#43; suppose to be.
+Why not Modern C&#43;&#43;? Back in late 1990 we were also modern-at-the-time C&#43;&#43; hipsters, and we used latest features. We told everyone also they should use those features too." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/orthodoxc&#43;&#43;/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2016-01-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-01-16T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Orthodox C&#43;&#43;"/>
+<meta name="twitter:description" content="This article was originally published as a gist here.
+What is Orthodox C&#43;&#43;? Orthodox C&#43;&#43; (sometimes referred as C&#43;) is minimal subset of C&#43;&#43; that improves C, but avoids all unnecessary things from so called Modern C&#43;&#43;. It&rsquo;s exactly opposite of what Modern C&#43;&#43; suppose to be.
+Why not Modern C&#43;&#43;? Back in late 1990 we were also modern-at-the-time C&#43;&#43; hipsters, and we used latest features. We told everyone also they should use those features too."/>
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/orthodoxc&#43;&#43;/">
+    <link href="/style.min.c0bb708cea238e476644e7743fe25ba61a3e8f2b534f5dd1d57e843c68e62c7d.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/about/">
+                        About
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Orthodox C&#43;&#43;</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2016-01-16T00:00:00&#43;00:00" itemprop="datePublished"> 2016-01-16 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#what-is-orthodox-c">What is Orthodox C++?</a></li>
+    <li><a href="#why-not-modern-c">Why not Modern C++?</a></li>
+    <li><a href="#why-use-orthodox-c">Why use Orthodox C++?</a></li>
+    <li><a href="#hello-world-in-orthodox-c">Hello World in Orthodox C++</a></li>
+    <li><a href="#what-should-i-use">What should I use?</a></li>
+    <li><a href="#is-it-safe-to-use-any-of-modern-cyear-features-yet">Is it safe to use any of Modern C++<year> features yet?</a></li>
+    <li><a href="#any-other-similar-ideas">Any other similar ideas?</a></li>
+    <li><a href="#code-examples">Code examples</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <p>This article was originally published as a gist <a href="https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b">here</a>.</p>
+<h2 id="what-is-orthodox-c">What is Orthodox C++?</h2>
+<p>Orthodox C++ (sometimes referred as <strong>C+</strong>) is minimal subset of C++ that improves C, but avoids all unnecessary things from so called Modern C++. It&rsquo;s exactly opposite of what <a href="https://stackoverflow.com/questions/3661237/what-is-modern-c">Modern C++</a> suppose to be.</p>
+<h2 id="why-not-modern-c">Why not Modern C++?</h2>
+<p>Back in late 1990 we were also modern-at-the-time C++ hipsters, and we used latest features. We told everyone also they should use those features too. Over time we learned it&rsquo;s unnecesary to use some language features just because they are there, or features we used proved to be bad (like RTTI, exceptions, and streams), or it backfired by unnecessary code complexity. If you think this is nonsense, just wait few more years and <a href="http://archive.md/2016.05.17-214038/https://www.linkedin.com/pulse/why-i-dont-spend-time-modern-c-anymore-henrique-bucher-phd">you&rsquo;ll hate Modern C++ too</a> (&ldquo;Why I don&rsquo;t spend time with Modern C++ anymore&rdquo; archived LinkedIn article).</p>
+<p><img alt="d0pfbigxcaeip0m" src="https://user-images.githubusercontent.com/814772/53454879-839a6480-39dd-11e9-9915-41baca494461.jpg"></p>
+<h2 id="why-use-orthodox-c">Why use Orthodox C++?</h2>
+<p>Code base written with Orthodox C++ limitations will be easer to understand, simpler, and it will build with older compilers. Projects written in Orthodox C++ subset will be more acceptable by other C++ projects because subset used by Orthodox C++ is unlikely to violate adopter&rsquo;s C++ subset preferences.</p>
+<h2 id="hello-world-in-orthodox-c">Hello World in Orthodox C++</h2>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main()
+{
+    printf(&quot;hello, world\n&quot;);
+    return 0;
+}
+</code></pre>
+<h2 id="what-should-i-use">What should I use?</h2>
+<ul>
+<li>C-like C++ is good start, if code doesn&rsquo;t require more complexity don&rsquo;t add unnecessary C++ complexities. In general case code should be readable to anyone who is familiar with C language.</li>
+<li>Don&rsquo;t do <a href="http://archive.md/2014.04.28-125041/http://www.boost.org/doc/libs/1_55_0/libs/geometry/doc/html/geometry/design.html">this</a>, the end of &ldquo;design rationale&rdquo; in Orthodox C++ should be immedately after &ldquo;Quite simple, and it is usable. <strong>EOF</strong>&rdquo;.</li>
+<li>Don&rsquo;t use <a href="https://web.archive.org/web/20190116034706/http://www.lighterra.com/papers/exceptionsharmful/">exceptions</a>.</li>
+</ul>
+<blockquote>
+<p>Exception handling is the only C++ language feature which requires significant support from a complex runtime system, and it&rsquo;s the only C++ feature that has a runtime cost even if you don&rsquo;t use it – sometimes as additional hidden code at every object construction, destruction, and try block entry/exit, and always by limiting what the compiler&rsquo;s optimizer can do, often quite significantly. Yet C++ exception specifications are not enforced at compile time anyway, so you don&rsquo;t even get to know that you didn&rsquo;t forget to handle some error case! And on a stylistic note, the exception style of error handling doesn&rsquo;t mesh very well with the C style of error return codes, which causes a real schism in programming styles because a great deal of C++ code must invariably call down into underlying C libraries.</p>
+</blockquote>
+<ul>
+<li>Don&rsquo;t use RTTI.</li>
+<li>Don&rsquo;t use C++ runtime wrapper for C runtime includes (<code>&lt;cstdio&gt;</code>, <code>&lt;cmath&gt;</code>, etc.), use C runtime instead (<code>&lt;stdio.h&gt;</code>, <code>&lt;math.h&gt;</code>, etc.)</li>
+<li>Don&rsquo;t use stream (<code>&lt;iostream&gt;</code>, <code>&lt;stringstream&gt;</code>, etc.), use printf style functions instead.</li>
+<li>Don&rsquo;t use anything from STL that allocates memory, unless you don&rsquo;t care about memory management. See <a href="https://www.youtube.com/watch?v=LIb3L4vKZ7U">CppCon 2015: Andrei Alexandrescu &ldquo;std::allocator Is to Allocation what std::vector Is to Vexation&rdquo;</a> talk, and <a href="https://web.archive.org/web/20220227163717/https://threadreaderapp.com/thread/1497768472184430600.html">Why many AAA gamedev studios opt out of the STL</a> thread for more info.</li>
+<li>Don&rsquo;t use metaprogramming excessively for academic masturbation. Use it in moderation, only where necessary, and where it reduces code complexity.</li>
+<li>Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example <code>constexpr</code> from C++11 became usable in C++14 (<a href="http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768">per Jason Turner</a> cppbestpractices.com curator)</li>
+</ul>
+<h2 id="is-it-safe-to-use-any-of-modern-cyear-features-yet">Is it safe to use any of Modern C++<year> features yet?</h2>
+<p>Due to lag of adoption of C++ standard by compilers, OS distributions, etc. it&rsquo;s usually not possible to start using new useful language features immediately. General guideline is: if current year is C++<em>year</em>+5 then it&rsquo;s safe to start <strong>selectively</strong> using C++<em>year</em>&rsquo;s features. For example, if standard is C++11, and current year &gt;= 2016 then it&rsquo;s probably safe. If standard required to compile your code is C++17 and year is 2016 then obviously you&rsquo;re practicing &ldquo;Resume Driven Development&rdquo; methodology. If you&rsquo;re doing this for open source project, then you&rsquo;re not creating something others can use.</p>
+<p><strong>UPDATE</strong> As of January 14th 2025, Orthodox C++ committee approved selective use of C++20.</p>
+<h2 id="any-other-similar-ideas">Any other similar ideas?</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Embedded_C%2B%2B">Embedded C++</a></li>
+<li><a href="http://archive.md/2016.08.07-162105/https://namandixit.github.io/blog/nominal-c++/">Nominal C++</a></li>
+<li><a href="http://archive.md/2016.08.07-162220/http://flohofwoe.blogspot.nl/2013/06/sane-c.html">Sane C++</a></li>
+<li><a href="http://archive.md/2017.03.19-055108/https://hacksoflife.blogspot.nl/2017/03/why-your-c-should-be-simple.html">Why Your C++ Should Be Simple</a></li>
+<li><a href="https://web.archive.org/web/20190227061553/https://c0de517e.blogspot.com/2019/02/c-its-not-you-its-me.html">C++, it’s not you. It’s me.</a></li>
+<li><a href="https://www.youtube.com/watch?v=lTXHOOwfTAo">&ldquo;Keep It C-mple&rdquo; Alexander Radchenko Sydney C++ Meetup</a></li>
+<li><a href="https://web.archive.org/web/20200521234043/https://satish.net.in/20180302/">A dialect of C++</a></li>
+<li><a href="https://web.archive.org/web/20241003193318/https://defold.com/2020/05/31/The-Defold-engine-code-style/">The Defold engine code style</a></li>
+<li><a href="https://github.com/d-musique/orthodoxy?tab=readme-ov-file#orthodoxy">Orthodoxy - plugin for the Clang compiler, which selectively disables specific features of the C++ language</a></li>
+</ul>
+<h2 id="code-examples">Code examples</h2>
+<ul>
+<li>Any C source that compiles with C++ compiler.</li>
+<li><a href="https://github.com/id-Software/DOOM-3-BFG">DOOM 3 BFG</a></li>
+<li><a href="https://github.com/qtproject">Qt</a> (when built with no-rtti, no-exceptions)</li>
+<li><a href="https://github.com/ocornut/imgui">dear imgui</a></li>
+<li><a href="https://github.com/bkaradzic/bgfx">bgfx</a></li>
+<li><a href="https://github.com/ConfettiFX/The-Forge">TheForge</a></li>
+<li><a href="https://github.com/floooh/oryol">Oryol</a></li>
+<li><a href="https://github.com/networknext/sdk">Network Next SDK</a></li>
+</ul>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2025 Branimir Karadžić.
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Branimir Karadžić&#39;s Home Page</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 08 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>bgfx is switching to IDL to generate API</title>
+      <link>http://localhost:1313/posts/idl/</link>
+      <pubDate>Mon, 08 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/idl/</guid>
+      
+      <description>This article was originally published as a gist here.
+bgfx main API is using basic C++ that looks like C, but it&amp;rsquo;s C++ enough that can&amp;rsquo;t be used directly in C projects. C is important as it provides ability to bind API to other languages, and also as sanity check for API design.
+Every time API changes manual process of process for adding/changing API for C99 bindings was changing header declarations of function and function type for interface virtual table (I&amp;rsquo;ll use bgfx::createVertexBuffer function as an example):</description>
+      
+    </item>
+    
+    <item>
+      <title>Why I think Immediate Mode GUI is way to go for GameDev tools</title>
+      <link>http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/</link>
+      <pubDate>Mon, 06 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/why-i-think-immediate-mode-gui-is-way-to-go-for-gamedev-tools/</guid>
+      
+      <description>This article was originally published as a gist here.
+Prerequisites Before you continue, if you don&amp;rsquo;t know what IMGUI is don&amp;rsquo;t bother reading this post, just ignore it, don&amp;rsquo;t write anything in comments section, etc. If you&amp;rsquo;re curious about IMGUI see bottom of this post, otherwise continue whatever you were doing, this post it&amp;rsquo;s not for you. Thanks!
+If you know what IMGUI is, for context read following presentations and blog posts:</description>
+      
+    </item>
+    
+    <item>
+      <title>Notes on header files</title>
+      <link>http://localhost:1313/posts/notes-on-header-files/</link>
+      <pubDate>Tue, 14 Feb 2017 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/notes-on-header-files/</guid>
+      
+      <description>This article was originally published as a gist here.
+After over 20 years working with C/C++ I finally got clear idea how header files need to be organized. Most of the projects in C++ world simply dump everything in .h file, and most of my C++ code was organized this way. Lately I started to separate function declaration from implementation as it was done in C. Now .h headers are exclusevely intended for function and class declaration with doxygen documentation style comments.</description>
+      
+    </item>
+    
+    <item>
+      <title>Orthodox C&#43;&#43;</title>
+      <link>http://localhost:1313/posts/orthodoxc&#43;&#43;/</link>
+      <pubDate>Sat, 16 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/orthodoxc&#43;&#43;/</guid>
+      
+      <description>This article was originally published as a gist here.
+What is Orthodox C++? Orthodox C++ (sometimes referred as C+) is minimal subset of C++ that improves C, but avoids all unnecessary things from so called Modern C++. It&amp;rsquo;s exactly opposite of what Modern C++ suppose to be.
+Why not Modern C++? Back in late 1990 we were also modern-at-the-time C++ hipsters, and we used latest features. We told everyone also they should use those features too.</description>
+      
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on Branimir Karadžić&#39;s Home Page</title>
+    <link>http://localhost:1313/pages/</link>
+    <description>Recent content in Pages on Branimir Karadžić&#39;s Home Page</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="http://localhost:1313/pages/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About</title>
+      <link>http://localhost:1313/pages/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/pages/about/</guid>
+      
+      <description>I received my first computer, the ZX Spectrum 48K, sometime in 1984. The BASIC prompt that appeared upon booting immediately sparked my fascination with programming. In the first few years, I played games, typed code from books and magazines, and created small programs of my own. From 1994 to 1997, I was captivated by the demoscene, producing demos and sub-4K intros in x86 assembly on PC. Building on that experience, I transitioned to game development, which I&amp;rsquo;ve pursued ever since.</description>
+      
+    </item>
+    
+  </channel>
+</rss>
