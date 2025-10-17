@@ -74,7 +74,7 @@ url = "/index.xml"
 
 [Languages.en-us.params]
   defaultColor = "auto" # set color mode: dark, light, auto
-  description = ""
+  description = "Branimir Karadžić's Home Page"
   mainSections = ['posts']
   toc = false # set to false to disable table of contents 'globally'
   tocOpen = true # set to true to open table of contents by default
