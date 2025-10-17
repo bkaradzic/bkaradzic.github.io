@@ -1,8 +1,11 @@
 all: clean
+	hugo
+
+server:
 	hugo server
 
 clean:
-	-rm -rf public
+	-rm -rf docs
 	-rm -rf resources
 	-rm -rf themes/hugo-blog-awesome/.git
 	-rm -rf themes/hugo-blog-awesome/.github
