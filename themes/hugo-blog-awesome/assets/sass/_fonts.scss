@@ -12,3 +12,10 @@
        url(fonts/Roboto/roboto-v30-latin-regular.ttf) format('truetype'), /* Safari, Android, iOS */
        url(fonts/Roboto/roboto-v30-latin-regular.svg#Roboto) format('svg'); /* Legacy iOS */
 }
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Noto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(fonts/Noto/NotoSerif-Regular.ttf) format('truetype');
+}
