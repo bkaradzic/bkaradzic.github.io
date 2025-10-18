@@ -6,7 +6,18 @@
     <description>Recent content in Home on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 08 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 17 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Branimir Karadžić Biography</title>
+      <link>https://bkaradzic.github.io/pages/bio/</link>
+      <pubDate>Fri, 17 Oct 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/pages/bio/</guid>
+      
+      <description>I received my first computer, the ZX Spectrum 48K, sometime in 1984. The BASIC prompt that appeared upon booting immediately sparked my fascination with programming. In the first few years, I played games, typed code from books and magazines, and created small programs of my own. From 1994 to 1997, I was captivated by the demoscene, producing demos and sub-4K intros in x86 assembly on PC. Building on that experience, I transitioned to game development, which I&amp;rsquo;ve pursued ever since.</description>
+      
+    </item>
+    
     <item>
       <title>bgfx is switching to IDL to generate API</title>
       <link>https://bkaradzic.github.io/posts/idl/</link>
@@ -80,17 +91,6 @@ Introduction We haven’t posted in a while here, sorry, but we are busy working
       
       <description>This article was originally published at Carbon Games blog here.
 One of the most common questions people are asking us is what engine/tech we’re using for AirMech. Well, yesterday we nuked last closed source library from our code base and as of today all the code we’re using is custom in-house or open source. We now have a complete list of open source software we’re using for our game development. This list is complete for all software we’re using on the client.</description>
-      
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>https://bkaradzic.github.io/pages/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://bkaradzic.github.io/pages/about/</guid>
-      
-      <description>I received my first computer, the ZX Spectrum 48K, sometime in 1984. The BASIC prompt that appeared upon booting immediately sparked my fascination with programming. In the first few years, I played games, typed code from books and magazines, and created small programs of my own. From 1994 to 1997, I was captivated by the demoscene, producing demos and sub-4K intros in x86 assembly on PC. Building on that experience, I transitioned to game development, which I&amp;rsquo;ve pursued ever since.</description>
       
     </item>
     

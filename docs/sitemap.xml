@@ -2,10 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://bkaradzic.github.io/posts/idl/</loc>
-    <lastmod>2019-04-08T00:00:00+00:00</lastmod>
+    <loc>https://bkaradzic.github.io/pages/bio/</loc>
+    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://bkaradzic.github.io/</loc>
+    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://bkaradzic.github.io/pages/</loc>
+    <lastmod>2025-10-17T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://bkaradzic.github.io/posts/idl/</loc>
     <lastmod>2019-04-08T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://bkaradzic.github.io/posts/</loc>
@@ -26,11 +32,7 @@
     <loc>https://bkaradzic.github.io/posts/open-source-or-it-didnt-happen/</loc>
     <lastmod>2011-09-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://bkaradzic.github.io/pages/about/</loc>
-  </url><url>
     <loc>https://bkaradzic.github.io/categories/</loc>
-  </url><url>
-    <loc>https://bkaradzic.github.io/pages/</loc>
   </url><url>
     <loc>https://bkaradzic.github.io/tags/</loc>
   </url>

@@ -67,9 +67,9 @@ url = "/index.xml"
     url = 'https://bkaradzic.github.io/bgfx/'
     weight = 30
   [[Languages.en-us.menu.main]]
-    pageRef="about"
-    name = 'About'
-    url = '/about/'
+    pageRef="bio"
+    name = 'Bio'
+    url = '/bio/'
     weight = 40
 
 [Languages.en-us.params]
