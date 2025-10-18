@@ -1,6 +1,7 @@
 ---
 title: Notes on header files
 date: 2017-02-14
+toc: false
 ---
 
 This article was originally published as a gist [here](https://gist.github.com/bkaradzic/6e5d447233137eeabaf240211aeb490c).
