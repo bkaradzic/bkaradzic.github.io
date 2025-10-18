@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Porting AirMech to Native Client | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Porting AirMech to Native Client | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Porting AirMech to Native Client | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Porting AirMech to Native Client | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Porting AirMech to Native Client | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/native-client/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2012-01-06T00:00:00Z />
+    <meta property="article:published_time" content=2012-01-06T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/native-client/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Porting AirMech to Native Client",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2012-01-06",
+        "description": "",
+        "wordCount":  2047 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2012-01-06",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Porting AirMech to Native Client" />
+<meta property="og:description" content="This article was originally published at Carbon Games blog here.
+This article is provided for archival purposes only. The technology discussed herein is obsolete.
+Introduction We haven’t posted in a while here, sorry, but we are busy working on the game and porting it to Native Client. Since the beginning we had the intention to make AirMech available on all platforms that our players are running. Early in our PC alpha we had a lot of requests for Linux and a Mac port and we were planning to do native ports, when Native Client support was made available for the Chrome web browser, we decided to give it a try." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/native-client/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2012-01-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2012-01-06T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Porting AirMech to Native Client"/>
+<meta name="twitter:description" content="This article was originally published at Carbon Games blog here.
+This article is provided for archival purposes only. The technology discussed herein is obsolete.
+Introduction We haven’t posted in a while here, sorry, but we are busy working on the game and porting it to Native Client. Since the beginning we had the intention to make AirMech available on all platforms that our players are running. Early in our PC alpha we had a lot of requests for Linux and a Mac port and we were planning to do native ports, when Native Client support was made available for the Chrome web browser, we decided to give it a try."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/native-client/">
+    <link href="/style.min.c0bb708cea238e476644e7743fe25ba61a3e8f2b534f5dd1d57e843c68e62c7d.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/about/">
+                        About
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Porting AirMech to Native Client</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2012-01-06T00:00:00&#43;00:00" itemprop="datePublished"> 2012-01-06 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#what-is-native-client">What is Native Client?</a></li>
+    <li><a href="#toolchain-and-sdk">Toolchain and SDK</a></li>
+    <li><a href="#sandbox">Sandbox</a></li>
+    <li><a href="#rendering">Rendering</a></li>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <p>This article was originally published at Carbon Games blog <a href="https://web.archive.org/web/20120121053957/http://carbongames.com/2012/01/Native-Client#disqus_thread">here</a>.</p>
+<p>This article is provided for archival purposes only. The technology discussed herein is obsolete.</p>
+<h2 id="introduction">Introduction</h2>
+<p>We haven’t posted in a while here, sorry, but we are busy working on the game and porting it to Native Client. Since the beginning we had the intention to make AirMech available on all platforms that our players are running. Early in our PC alpha we had a lot of requests for Linux and a Mac port and we were planning to do native ports, when Native Client support was made available for the Chrome web browser, we decided to give it a try. This blog post is short description of the process of porting our game to support Native Client.</p>
+<h2 id="what-is-native-client">What is Native Client?</h2>
+<p><a href="https://en.wikipedia.org/wiki/Google_Native_Client">Native Client</a>, often called simply NaCl, is a plugin technology that runs inside Chrome browser, and hopefully in the future, all browsers. It enables applications written in C/C++ to run natively inside a secure sandbox. This sandbox is there to protect users from malicious or buggy applications. In a sense it’s similar to ActiveX, but other than native execution, other similarities don’t exist. Actually with the amount security concerns put into the whole Native Client, it’s not even fair to compare it to ActiveX technology.</p>
+<p>Someone might ask ‘why does native executable matters for games in browser?’ Because speed of execution matters, and JavaScript’s abstraction penalty is too high. I know there will be people trying to argue that JavaScript is as fast or approaching speeds of native execution, but seriously, my answer to those people is prove it! Also, please don’t use some WebGL example where JavaScript renders a quad across the screen and most of the work is done in the fragment shader.</p>
+<h2 id="toolchain-and-sdk">Toolchain and SDK</h2>
+<p>We anticipated that we would port our game to other platforms and the first step to porting is to add at least one more compiler into the mix. Almost all non-Microsoft platforms are using GCC or compiler that’s compatible with GCC. So I got AirMech code base compiling with MinGW on Windows early on. <a href="https://web.archive.org/web/20120119020903/http://carbongames.com/2011/08/Premake/">Premake</a> makes adding different GCC (I call it GCC ‘flavors’) toolchains trivial. But to port our game to NaCl we had to remove our dependency on a closed-source physics library that didn’t support NaCl and to switch to an <a href="http://localhost:1313/posts/open-source-or-it-didnt-happen/">open source</a> physics library. After that getting the game to compile and link with NaCl toolchain was matter of #ifdef-ing our Windows specific code.</p>
+<p>I haven’t really found any limitations in comparison with our native build. For some reason I expected that assembly won’t be accessible, but actually you can write assembly without any problems. This might be handy if you have profiling code depending on RDTSC and CPUID instructions or some other optimized code that depends on the SSE instruction set. SSE intrinsics can be enabled with -msseX compiler option where X is SSE version. All of this might break in the future once more CPUs are targeted with NaCl, but for now it just works.</p>
+<p>All access to input, sound, graphics, etc. is done thru Pepper API (PPAPI). The SDK offers both C and C++ API. Since we have exceptions and RTTI off for the whole project I couldn’t use C++ PPAPI, but I also I found that it’s easier to deal with C PPAPI.</p>
+<p>The Toolchain comes with standard GDB debugger. I find GDB debugger to be more of a deterrence strategy debugger, because when only GDB is available, the programmer is just more careful while coding so that use of GDB is not necessary. When I had problems with NaCl module I did all debugging with printfs. Printf is just the most versatile, feature complete, cross platform debugger.</p>
+<h2 id="sandbox">Sandbox</h2>
+<p>To run an executable you have to run a local web server. My choice was Nginx, since it’s pretty easy to setup. Mongoose would be even easier, I just didn’t know about it at the time. This was also the first speed bump I encounter. I had to get adjusted to the fact that NaCl executable has all the restrictions any regular web page would have. You can’t access the file system, open files, read/write them, etc., you have to fetch them with an HTTP request from the remote website. All file access is abstracted and we were using packages on Windows anyway. I just added memory file access, that behaves like regular file access, but everything is stored in memory. Another issue was that there is no regular main entry point, actually there is but it’s reserved for the Pepper API. The regular NaCl module starts with a callback that Chrome makes to Pepper. The simplest thing to do is just to call pthread_create and inside thread function call, just call your main. This actually helps in general because the main thread cannot be blocked by game loop. Also most of the calls to Pepper are completely asynchronous, and you have to wait for completion callback which is called on main thread.</p>
+<p>Sometimes the sandbox gets in the way, for example for our network debugging we’re using journaling technique. Journaling produces a lot of data that we dump on disc. Rate is around 1GB per 5 minutes of game play, but without direct access to disk we don’t have good way to write it. I still haven’t solved this problem, but probably what I’m going to do is to add server that would just dump everything sent thru WebSocket to disk.</p>
+<h2 id="rendering">Rendering</h2>
+<p>Our renderer was Direct3D based, which makes sense for Windows but we had to port it to OpenGL. Now there is longer story about our renderer, which was originally OpenGL based, written by Ken a long time ago, and morphed into Direct3D. In general it looked like and behaved like OpenGL but it was crusty and hard to extend. I decided that it’s time for fresh start and in order to implement the features we need we needed fresh start. NaCl like WebGL is using OpenGL ES 2.0 which is actually a pretty decent subset of OpenGL. I would call it OpenGL Lite. It’s definitely missing some nice to have features from Direct3D, but in general OpenGL was extension mess for such a long time that OpenGL ES 2.0 feels like fresh start and another chance for OpenGL.</p>
+<p>Below is the first screenshot of our OpenGL ES renderer. It’s not pretty but it was exciting to see our game run in the browser for the first time!</p>
+<p><img alt="AirMech NaCl Early Rendering" src="/posts/native-client/airmech_nacl_0.png"></p>
+<p>The only issue I noticed with rendering inside NaCl is that there is an extra frame(s) latency. It seems to vary between 2-3 extra frames. This is due that GPU calls are submitted from a completely different process and that all has to be communicated thru RPCs. Because of this any OpenGL call that depends on GPU result are very expensive. Calling glFinish or glGetError will cause your game to block until GPU catches up. This latency is not huge a issue for AirMech, but this might be an issue for those who are making twitch game and where a split second makes huge difference. The only thing we had to do so far is disable rendering of in game mouse. This will probably dictate what kind of games we’ll see on NaCl.</p>
+<p>Also graphics is the only place where you might experience cross platform issues, so you have to test it on all platforms. So far we found only one fragment shader bug on Mac that doesn’t appear on Linux or Windows with casting matrix types mat4 into mat2.</p>
+<p>Chrome support for GPUs on different platforms varies and it’s due to driver support. For example some GPUs that work well under Windows with Chrome are blacklisted by Chrome on Linux. We don’t have a good way to detect this, and if player decided to ‘un-blacklist’ GPU, the game might just crash or not render graphics. But that’s a known issue and hopefuly drivers for GPUs on Linux will improve over time and Chrome will remove certain GPUs from their blacklist. Depending on the number of players having issues like this we might consider having really simple shaders that would work even on those blacklisted drivers, but that would have visual impact on the look of the game.</p>
+<p>For a while we had two renderers in the code base and only recently we made complete switch to the new renderer. Now we support both Direct3D 9 and OpenGL ES 2.0. These standards are close in feature set and they cover wide variety of platforms, from smartphones and tablets to current generation of consoles.
+Networking</p>
+<p>NaCl doesn’t support networking natively yet. All network traffic has to go thru JavaScript and use WebSocket. To send data between a NaCl module and JavaScript it must be UTF8 encoded string, therefore the stream can’t be binary. Our network stream is Base64 encoded, which produces 1/3 more data (24 bits are encoded into 32 bits) than regular binary TCP stream. There is also additional latency added in this communication between NaCl module and JavaScript, and we’re seeing slightly higher round trip times over our native version. We’re doing all our network testing on remote servers located in California and this additional latency didn’t affect the game play in comparison with our native version.</p>
+<p>Since <a href="http://github.com/bkaradzic/bnet">our existing network library uses TCP</a>, I just implemented standard BSD socket functions socket, connect, send, recv, select, etc. that behave exactly like standard TCP socket but do work of encoding/decoding stream between the NaCl module and JavaScript. That way there are no changes in how our game communicates with the remote host and it’s all compatible with our existing code. If this sounds complicated, you should not worry because NaCl is getting native support for WebSockets in one of upcoming releases and all this won’t be necessary anymore. You’ll be able to directly connect to WebSocket without going thru JavaScript. Hopefully this will reduce latency we were seeing. You can take a look at an early version of the upcoming PPAPI WebSocket interface here: C API and C++ API.</p>
+<p>On the backend we’re using the Go language, and adding WebSocket to our existing game session server was literally 10 lines of code. A few lines of code to get WebSocket handler function and a few to add Base64 encoder/decoder to the socket stream.
+Conclusion</p>
+<p>Overall our experience with Native Client is positive. It’s great that finally we can write C/C++ code and execute it in the browser! I’ve been watching this project since it was announced by Google a few years ago. At the time they announced it I expected to see it integrated into browsers quickly but it seems the Native Client went thru very slow process to get to the hands of users. Also there are other benefits of mixing native code with web technologies. Features that would be hard to implement in a regular game that runs natively outside the browser become almost trivial to implement with NaCl. For example if you want to make a only browser game, you can go crazy with integrating web features into your game. One thing immediately comes to mind is integrating YouTube videos, or social features into the game. All this doesn’t even have to be inside NaCl module, it can be just communicated thru JavaScript and displayed as an overlay on the top of NaCl module.</p>
+<p>AirMech will be available in the ChromeWeb Store later this year. Right now we’re in still in an alpha development phase. If you would like to check our the AirMech alpha build or how Native Client works for you, you can join AirMech Alpha Google Group and we’ll give access to our latest build of AirMech running on Native Client.</p>
+<p><img alt="AirMech NaCl Final" src="/posts/native-client/airmech_nacl_1.png"></p>
+<h2 id="resources">Resources</h2>
+<p>Information about developing for NaCl is a bit scarce right now, but I hope this blog post will be useful if you’re thinking or trying to port your code base to NaCl. If you feel you would like to try to build your application or game for NaCl, these are good starting points for more information about NaCl development:</p>
+<ul>
+<li>
+<p>Official Native Client Developer site<br>
+<a href="https://web.archive.org/web/20120121053957/https://developers.google.com/native-client/">https://web.archive.org/web/20120121053957/https://developers.google.com/native-client/</a></p>
+</li>
+<li>
+<p>The Workbench<br>
+<a href="https://web.archive.org/web/20120121053957/http://mainroach.blogspot.com/">https://web.archive.org/web/20120121053957/http://mainroach.blogspot.com/</a></p>
+</li>
+<li>
+<p>Notes on Native Client &amp; Pepper Plugin API<br>
+<a href="https://web.archive.org/web/20120121053957/http://aras-p.info/blog/2011/06/02/notes-on-native-client-pepper-plugin-api/">https://web.archive.org/web/20120121053957/http://aras-p.info/blog/2011/06/02/notes-on-native-client-pepper-plugin-api/</a></p>
+</li>
+<li>
+<p>Native Client For Dummies<br>
+<a href="https://web.archive.org/web/20120121053957/http://altdevblogaday.com/2011/10/26/native-client-for-dummies/">https://web.archive.org/web/20120121053957/http://altdevblogaday.com/2011/10/26/native-client-for-dummies/</a></p>
+</li>
+<li>
+<p>GameDevBlog<br>
+<a href="https://web.archive.org/web/20120121053957/http://www.gamedevblog.com/">https://web.archive.org/web/20120121053957/http://www.gamedevblog.com/</a></p>
+</li>
+</ul>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2025 Branimir Karadžić.
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

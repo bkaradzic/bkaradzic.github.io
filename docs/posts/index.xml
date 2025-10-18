@@ -58,5 +58,30 @@ Why not Modern C++? Back in late 1990 we were also modern-at-the-time C++ hipste
       
     </item>
     
+    <item>
+      <title>Porting AirMech to Native Client</title>
+      <link>https://bkaradzic.github.io/posts/native-client/</link>
+      <pubDate>Fri, 06 Jan 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/native-client/</guid>
+      
+      <description>This article was originally published at Carbon Games blog here.
+This article is provided for archival purposes only. The technology discussed herein is obsolete.
+Introduction We haven’t posted in a while here, sorry, but we are busy working on the game and porting it to Native Client. Since the beginning we had the intention to make AirMech available on all platforms that our players are running. Early in our PC alpha we had a lot of requests for Linux and a Mac port and we were planning to do native ports, when Native Client support was made available for the Chrome web browser, we decided to give it a try.</description>
+      
+    </item>
+    
+    <item>
+      <title>Open source or it didn&#39;t happen!</title>
+      <link>https://bkaradzic.github.io/posts/open-source-or-it-didnt-happen/</link>
+      <pubDate>Tue, 20 Sep 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/open-source-or-it-didnt-happen/</guid>
+      
+      <description>This article was originally published at Carbon Games blog here.
+One of the most common questions people are asking us is what engine/tech we’re using for AirMech. Well, yesterday we nuked last closed source library from our code base and as of today all the code we’re using is custom in-house or open source. We now have a complete list of open source software we’re using for our game development. This list is complete for all software we’re using on the client.</description>
+      
+    </item>
+    
   </channel>
 </rss>
