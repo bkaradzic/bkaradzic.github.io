@@ -14,7 +14,7 @@ Orthodox C++ (sometimes referred as **C+**) is minimal subset of C++ that improv
 
 Back in late 1990 we were also modern-at-the-time C++ hipsters, and we used latest features. We told everyone also they should use those features too. Over time we learned it's unnecesary to use some language features just because they are there, or features we used proved to be bad (like RTTI, exceptions, and streams), or it backfired by unnecessary code complexity. If you think this is nonsense, just wait few more years and [you'll hate Modern C++ too](http://archive.md/2016.05.17-214038/https://www.linkedin.com/pulse/why-i-dont-spend-time-modern-c-anymore-henrique-bucher-phd) ("Why I don't spend time with Modern C++ anymore" archived LinkedIn article).
 
-![d0pfbigxcaeip0m](https://user-images.githubusercontent.com/814772/53454879-839a6480-39dd-11e9-9915-41baca494461.jpg)
+![d0pfbigxcaeip0m](53454879-839a6480-39dd-11e9-9915-41baca494461.jpg)
 
 ## Why use Orthodox C++?
 

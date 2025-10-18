@@ -70,14 +70,12 @@ Examples
 
 Here are few screenshots of GameDev tools made with IMGUI:
 
-![0](https://cloud.githubusercontent.com/assets/814772/17825130/ee09ace8-661a-11e6-80b5-c315fa4eaaa6.png)
-![1](https://cloud.githubusercontent.com/assets/153526/17481789/18b71916-5d7f-11e6-9726-9e17dec1f3b4.png)
-![2](https://cloud.githubusercontent.com/assets/1499411/22198936/6a085efe-e161-11e6-8d76-3ba179e7c76b.png)
-![3](https://cloud.githubusercontent.com/assets/8225057/20628927/33e14cac-b329-11e6-80f6-9524e93b048a.png)
-![4](https://cloud.githubusercontent.com/assets/8225057/21047677/7b667d80-be0b-11e6-80c5-80e9055310c8.jpg)
-![5](https://cloud.githubusercontent.com/assets/12642134/21346800/3c188ee0-c6a6-11e6-980f-05fadcc30b99.jpg)
-![6](https://camo.githubusercontent.com/3c42dabb202ee7169eca05a9c858439f0414093b/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4553525a696835576f4163447446393f666f726d61743d6a7067266e616d653d6c61726765)
-![7](https://camo.githubusercontent.com/16cb436299b323f22d78899ffd97acc8ce8f1299/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4553525a69683558304141654e78303f666f726d61743d6a7067266e616d653d6c61726765)
+![0](ee09ace8-661a-11e6-80b5-c315fa4eaaa6.png)
+![1](18b71916-5d7f-11e6-9726-9e17dec1f3b4.png)
+![2](6a085efe-e161-11e6-8d76-3ba179e7c76b.png)
+![3](33e14cac-b329-11e6-80f6-9524e93b048a.png)
+![4](7b667d80-be0b-11e6-80c5-80e9055310c8.jpg)
+![5](3c188ee0-c6a6-11e6-980f-05fadcc30b99.jpg)
 
 See other IMGUI screenshots here:  
 https://github.com/ocornut/imgui/issues/123  
