@@ -57,24 +57,54 @@ Due to lag of adoption of C++ standard by compilers, OS distributions, etc. it's
 
 ## Any other similar ideas?
 
- - [Embedded C++](https://en.wikipedia.org/wiki/Embedded_C%2B%2B)
- - [Nominal C++](http://archive.md/2016.08.07-162105/https://namandixit.github.io/blog/nominal-c++/)
- - [Sane C++](http://archive.md/2016.08.07-162220/http://flohofwoe.blogspot.nl/2013/06/sane-c.html)
- - [Why Your C++ Should Be Simple](http://archive.md/2017.03.19-055108/https://hacksoflife.blogspot.nl/2017/03/why-your-c-should-be-simple.html)
- - [C++, it’s not you. It’s me.](https://web.archive.org/web/20190227061553/https://c0de517e.blogspot.com/2019/02/c-its-not-you-its-me.html)
- - ["Keep It C-mple" Alexander Radchenko Sydney C++ Meetup](https://www.youtube.com/watch?v=lTXHOOwfTAo)
- - [A dialect of C++](https://web.archive.org/web/20200521234043/https://satish.net.in/20180302/)
- - [The Defold engine code style](https://web.archive.org/web/20241003193318/https://defold.com/2020/05/31/The-Defold-engine-code-style/)
- - [Orthodoxy - plugin for the Clang compiler, which selectively disables specific features of the C++ language](https://github.com/d-musique/orthodoxy?tab=readme-ov-file#orthodoxy)
+ - Embedded C++  
+   https://en.wikipedia.org/wiki/Embedded_C%2B%2B
+
+ - Nominal C++  
+   http://archive.md/2016.08.07-162105/https://namandixit.github.io/blog/nominal-c++/
+
+ - Sane C++  
+   http://archive.md/2016.08.07-162220/http://flohofwoe.blogspot.nl/2013/06/sane-c.html
+
+ - Why Your C++ Should Be Simple  
+   http://archive.md/2017.03.19-055108/https://hacksoflife.blogspot.nl/2017/03/why-your-c-should-be-simple.html
+
+ - C++, it’s not you. It’s me.  
+   https://web.archive.org/web/20190227061553/https://c0de517e.blogspot.com/2019/02/c-its-not-you-its-me.html
+
+ - "Keep It C-mple" Alexander Radchenko Sydney C++ Meetup  
+   https://www.youtube.com/watch?v=lTXHOOwfTAo
+
+ - A dialect of C++  
+   https://web.archive.org/web/20200521234043/https://satish.net.in/20180302/
+
+ - The Defold engine code style  
+   https://web.archive.org/web/20241003193318/https://defold.com/2020/05/31/The-Defold-engine-code-style/
+
+ - Orthodoxy - plugin for the Clang compiler, which selectively disables specific features of the C++ language  
+   https://github.com/d-musique/orthodoxy?tab=readme-ov-file#orthodoxy
  
 ## Code examples
 
  - Any C source that compiles with C++ compiler.
- - [DOOM 3 BFG](https://github.com/id-Software/DOOM-3-BFG)
- - [Qt](https://github.com/qtproject) (when built with no-rtti, no-exceptions)
- - [dear imgui](https://github.com/ocornut/imgui)
- - [bgfx](https://github.com/bkaradzic/bgfx)
- - [TheForge](https://github.com/ConfettiFX/The-Forge)
- - [Oryol](https://github.com/floooh/oryol)
- - [Network Next SDK](https://github.com/networknext/sdk)
- 
+
+ - DOOM 3 BFG  
+   https://github.com/id-Software/DOOM-3-BFG
+
+ - Qt  
+   https://github.com/qtproject) (when built with no-rtti, no-exceptions
+
+ - dear imgui  
+   https://github.com/ocornut/imgui
+
+ - bgfx  
+   https://github.com/bkaradzic/bgfx
+
+ - TheForge  
+   https://github.com/ConfettiFX/The-Forge
+
+ - Oryol  
+   https://github.com/floooh/oryol
+
+ - Network Next SDK  
+   https://github.com/networknext/sdk
