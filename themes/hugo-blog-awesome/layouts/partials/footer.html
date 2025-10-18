@@ -6,9 +6,10 @@
         {{- partial "socialIcons.html" site.Params.socialIcons -}}
     </div>
     <small class="footer_copyright">
-        © {{ now.Format "2006" }} {{ .Site.Params.author.name }}.
+        © {{ now.Format "2006" }} {{ .Site.Params.author.name }}.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        {{ T "footer.disclaimer" | safeHTML }}</br>
         <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
-        {{ T "footer.disclaimer" | safeHTML }}
     </small>
 </footer>
 
