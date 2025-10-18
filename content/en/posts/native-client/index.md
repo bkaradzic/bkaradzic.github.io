@@ -40,7 +40,11 @@ Our renderer was Direct3D based, which makes sense for Windows but we had to por
 
 Below is the first screenshot of our OpenGL ES renderer. It’s not pretty but it was exciting to see our game run in the browser for the first time!
 
+<div style="text-align: center;">
+
 ![AirMech NaCl Early Rendering](airmech_nacl_0.png)
+
+</div>
 
 The only issue I noticed with rendering inside NaCl is that there is an extra frame(s) latency. It seems to vary between 2-3 extra frames. This is due that GPU calls are submitted from a completely different process and that all has to be communicated thru RPCs. Because of this any OpenGL call that depends on GPU result are very expensive. Calling glFinish or glGetError will cause your game to block until GPU catches up. This latency is not huge a issue for AirMech, but this might be an issue for those who are making twitch game and where a split second makes huge difference. The only thing we had to do so far is disable rendering of in game mouse. This will probably dictate what kind of games we’ll see on NaCl.
 
@@ -62,7 +66,11 @@ Overall our experience with Native Client is positive. It’s great that finally
 
 AirMech will be available in the ChromeWeb Store later this year. Right now we’re in still in an alpha development phase. If you would like to check our the AirMech alpha build or how Native Client works for you, you can join AirMech Alpha Google Group and we’ll give access to our latest build of AirMech running on Native Client.
 
+<div style="text-align: center;">
+
 ![AirMech NaCl Final](airmech_nacl_1.png)
+
+</div>
 
 ## Resources
 

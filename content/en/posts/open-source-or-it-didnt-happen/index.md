@@ -14,7 +14,11 @@ Based on questions we are asked I’m under the impression that, for some reason
 
 Just because it’s open source doesn’t mean it’s good by default. When choosing an open source library, we have a few considerations. We avoid bloated libraries that are trying to do everything. Ideally library is only doing one thing and it’s doing it really well. It’s easy to integrate and maintain. Also even thought we’re using C++, we find it easier to adopt a library written in C than in C++. Usually C++ libraries tend to be more complex than their C counterparts. This complexity usually comes from requirement to include other libraries or just from the feature set. Often C++ libraries look like someone was trying to impress the C++ committee with their metaprogramming cleverness than to create something useful for other C++ programmers to use. When we choose a C++ library, the library cannot require the use of exceptions or RTTI functionality of C++ language, since these are always disabled in all our builds.
 
-3rd Party Sofware Flowchart
+<div style="text-align: center;">
+
+![3rd Party Sofware Flowchart](software_flowchart.jpg)
+
+</div>
 
 Just as a simple example of how this theory and flow chart above works; if we were looking for a json library for the client it would be to very lite and know only how to write and how to parse valid json. We don’t need validation, since all json files will come from trusted source which are package files or our backend. And on the backend we’re using more robust json library that supports validation of data that’s coming from client. If offered choice between [JSON_Spirit](https://web.archive.org/web/20120131160725/http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx) and [js0n](https://web.archive.org/web/20120131160725/https://github.com/quartzjer/js0n/blob/master/js0n.c) we would pick js0n. js0n satisfies most of our client requirements, it doesn’t require extra libraries, it’s easy to integrate, and we would only need to write json writer. Simple always wins!
 
