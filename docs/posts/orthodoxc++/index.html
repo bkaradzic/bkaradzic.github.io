@@ -53,7 +53,7 @@
         },
         "datePublished": "2016-01-16",
         "description": "",
-        "wordCount":  752 ,
+        "wordCount":  839 ,
         "mainEntityOfPage": "True",
         "dateModified": "2016-01-16",
         "image": {
@@ -258,7 +258,22 @@ int main()
 <li>Don&rsquo;t use anything from STL that allocates memory, unless you don&rsquo;t care about memory management. See <a href="https://www.youtube.com/watch?v=LIb3L4vKZ7U">CppCon 2015: Andrei Alexandrescu &ldquo;std::allocator Is to Allocation what std::vector Is to Vexation&rdquo;</a> talk, and <a href="https://web.archive.org/web/20220227163717/https://threadreaderapp.com/thread/1497768472184430600.html">Why many AAA gamedev studios opt out of the STL</a> thread for more info.</li>
 <li>Don&rsquo;t use metaprogramming excessively for academic masturbation. Use it in moderation, only where necessary, and where it reduces code complexity.</li>
 <li>Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example <code>constexpr</code> from C++11 became usable in C++14 (<a href="http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768">per Jason Turner</a> cppbestpractices.com curator)</li>
+<li>Don&rsquo;t use <a href="https://web.archive.org/web/20251019163438/https://nibblestew.blogspot.com/2025/08/we-need-to-seriously-think-about-what.html">modules</a>.</li>
 </ul>
+<blockquote>
+<p>Using modules brings with it the following disadvantages:</p>
+<ol>
+<li>Need to rewrite (possibly refactor) your code.</li>
+<li>Loss of portability.</li>
+<li>Module binary files (with the exception of MSVC) are not portable so you need to provide header files for libraries in any case.</li>
+<li>The project build setup becomes more complicated.</li>
+<li>Any toolchain version except the newest one does not work (at the time of writing Apple&rsquo;s module support is listed as &ldquo;partial&rdquo;)</li>
+</ol>
+<p>In exchange for all this you, the regular developer-about-town, get the following advantages:</p>
+<ol>
+<li>Nothing.</li>
+</ol>
+</blockquote>
 <h2 id="is-it-safe-to-use-any-of-modern-cyear-features-yet">Is it safe to use any of Modern C++<year> features yet?</h2>
 <p>Due to lag of adoption of C++ standard by compilers, OS distributions, etc. it&rsquo;s usually not possible to start using new useful language features immediately. General guideline is: if current year is C++<em>year</em>+5 then it&rsquo;s safe to start <strong>selectively</strong> using C++<em>year</em>&rsquo;s features. For example, if standard is C++11, and current year &gt;= 2016 then it&rsquo;s probably safe. If standard required to compile your code is C++17 and year is 2016 then obviously you&rsquo;re practicing &ldquo;Resume Driven Development&rdquo; methodology. If you&rsquo;re doing this for open source project, then you&rsquo;re not creating something others can use.</p>
 <p><strong>UPDATE</strong> As of January 14th 2025, Orthodox C++ committee approved selective use of C++20.</p>

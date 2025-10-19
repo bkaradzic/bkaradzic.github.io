@@ -47,7 +47,20 @@ Code base written with Orthodox C++ limitations will be easer to understand, sim
  - Don't use stream (`<iostream>`, `<stringstream>`, etc.), use printf style functions instead.
  - Don't use anything from STL that allocates memory, unless you don't care about memory management. See [CppCon 2015: Andrei Alexandrescu "std::allocator Is to Allocation what std::vector Is to Vexation"](https://www.youtube.com/watch?v=LIb3L4vKZ7U) talk, and [Why many AAA gamedev studios opt out of the STL](https://web.archive.org/web/20220227163717/https://threadreaderapp.com/thread/1497768472184430600.html) thread for more info. 
  - Don't use metaprogramming excessively for academic masturbation. Use it in moderation, only where necessary, and where it reduces code complexity.
- -  Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example `constexpr` from C++11 became usable in C++14 ([per Jason Turner](http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768) cppbestpractices.com curator)
+ - Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example `constexpr` from C++11 became usable in C++14 ([per Jason Turner](http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768) cppbestpractices.com curator)
+ - Don't use [modules](https://web.archive.org/web/20251019163438/https://nibblestew.blogspot.com/2025/08/we-need-to-seriously-think-about-what.html).
+
+> Using modules brings with it the following disadvantages:
+>
+>   1. Need to rewrite (possibly refactor) your code.
+>   2. Loss of portability.
+>   3. Module binary files (with the exception of MSVC) are not portable so you need to provide header files for libraries in any case.
+>   4. The project build setup becomes more complicated.
+>   5. Any toolchain version except the newest one does not work (at the time of writing Apple's module support is listed as "partial")
+>
+> In exchange for all this you, the regular developer-about-town, get the following advantages:
+>
+>   1. Nothing.
 
 ## Is it safe to use any of Modern C++<year> features yet?
 
