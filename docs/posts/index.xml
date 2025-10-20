@@ -6,7 +6,18 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 08 Apr 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 20 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fast Call-Stack Backtrace</title>
+      <link>https://bkaradzic.github.io/posts/fast-call-stack-backtrace/</link>
+      <pubDate>Mon, 20 Oct 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/fast-call-stack-backtrace/</guid>
+      
+      <description>Introduction When developing a profiler, memory tracker, or logger, you need to programmatically access the call stack to trace how a program reached the location where a method is called. Operating systems offer APIs for call stack tracing, but these are often too slow for practical real-time use. This article will try to demystify all ways of obtaining call-stack traces on different platforms, and I won&amp;rsquo;t cover resolving debug symbol names here.</description>
+      
+    </item>
+    
     <item>
       <title>bgfx is switching to IDL to generate API</title>
       <link>https://bkaradzic.github.io/posts/idl/</link>
