@@ -47,7 +47,7 @@ Code base written with Orthodox C++ limitations will be easer to understand, sim
  - Don't use stream (`<iostream>`, `<stringstream>`, etc.), use printf style functions instead.
  - Don't use anything from STL that allocates memory, unless you don't care about memory management. See [CppCon 2015: Andrei Alexandrescu "std::allocator Is to Allocation what std::vector Is to Vexation"](https://www.youtube.com/watch?v=LIb3L4vKZ7U) talk, and [Why many AAA gamedev studios opt out of the STL](https://web.archive.org/web/20220227163717/https://threadreaderapp.com/thread/1497768472184430600.html) thread for more info. 
  - Don't use metaprogramming excessively for academic masturbation. Use it in moderation, only where necessary, and where it reduces code complexity.
- - Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example `constexpr` from C++11 became usable in C++14 ([per Jason Turner](http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768) cppbestpractices.com curator)
+ - Wary of any features introduced in current standard C++<year>, ideally wait for improvements of those feature in next iteration of standard. Example `constexpr` from C++11 became usable in C++14 ([per Jason Turner](http://archive.md/2018.02.01-171248/https://twitter.com/lefticus/status/958931109009440768) cppbestpractices.com curator).
  - Don't use [modules](https://web.archive.org/web/20251019163438/https://nibblestew.blogspot.com/2025/08/we-need-to-seriously-think-about-what.html).
 
 > Using modules brings with it the following disadvantages:
@@ -71,8 +71,8 @@ Due to lag of adoption of C++ standard by compilers, OS distributions, etc. it's
 **UPDATE** As of January 14th 2025, Orthodox C++ committee approved selective use of C++20.
 
  - Oct 19, 2025 - [Added info on modules](/posts/orthodoxc++/#:~:text=Don%E2%80%99t%20use%20modules.,Nothing.).
- - Jan 16, 2019 - [Added exception handling](/posts/orthodoxc++/#:~:text=Don%E2%80%99t%20use%20exceptions.,C%20libraries.).
- - Feb  1, 2018 - [Addded info how constexpr needed multiple iterations to be useful](/posts/orthodoxc++/#:~:text=Wary%20of%20any,curator).
+ - Jan 16, 2019 - [Added info on exception handling](/posts/orthodoxc++/#:~:text=Don%E2%80%99t%20use%20exceptions.,C%20libraries.).
+ - Feb  1, 2018 - [Added info how constexpr needed multiple iterations to be useful](/posts/orthodoxc++/#:~:text=Wary%20of%20any,curator).
  - Jan 16, 2016 - [The original article.](https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b/efe7b7470a488d7752ca28c87146d80d83b3e71b).
 
 ## Any other similar ideas?
