@@ -66,7 +66,14 @@ Code base written with Orthodox C++ limitations will be easer to understand, sim
 
 Due to lag of adoption of C++ standard by compilers, OS distributions, etc. it's usually not possible to start using new useful language features immediately. General guideline is: if current year is C++_year_+5 then it's safe to start **selectively** using C++_year_'s features. For example, if standard is C++11, and current year >= 2016 then it's probably safe. If standard required to compile your code is C++17 and year is 2016 then obviously you're practicing "Resume Driven Development" methodology. If you're doing this for open source project, then you're not creating something others can use.
 
+## Revision History
+
 **UPDATE** As of January 14th 2025, Orthodox C++ committee approved selective use of C++20.
+
+ - Oct 19, 2025 - [Added info on modules](/posts/orthodoxc++/#:~:text=Don%E2%80%99t%20use%20modules.,Nothing.).
+ - Jan 16, 2019 - [Added exception handling](/posts/orthodoxc++/#:~:text=Don%E2%80%99t%20use%20exceptions.,C%20libraries.).
+ - Feb  1, 2018 - [Addded info how constexpr needed multiple iterations to be useful](/posts/orthodoxc++/#:~:text=Wary%20of%20any,curator).
+ - Jan 16, 2016 - [The original article.](https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b/efe7b7470a488d7752ca28c87146d80d83b3e71b).
 
 ## Any other similar ideas?
 
