@@ -22,6 +22,8 @@ Back in late 1990 we were also modern-at-the-time C++ hipsters, and we used late
 
 ## Why use Orthodox C++?
 
+> "Within C++, there is a much smaller and cleaner language struggling to get out." -- [Bjarne Stroustrup](https://web.archive.org/web/20201128151900/https://www.stroustrup.com/quotes.html#:~:text=%22Within%20C++,to%20get%20out%22.)
+
 Code base written with Orthodox C++ limitations will be easer to understand, simpler, and it will build with older compilers. Projects written in Orthodox C++ subset will be more acceptable by other C++ projects because subset used by Orthodox C++ is unlikely to violate adopter's C++ subset preferences.
 
 ## Hello World in Orthodox C++
