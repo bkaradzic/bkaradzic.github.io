@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">bgfx WebGPU backend, second take! | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="bgfx WebGPU backend, second take! | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="bgfx WebGPU backend, second take! | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="bgfx WebGPU backend, second take! | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="bgfx WebGPU backend, second take! | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/webgpu/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-01-12T00:00:00Z />
+    <meta property="article:published_time" content=2026-01-12T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/webgpu/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "bgfx WebGPU backend, second take!",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-01-12",
+        "description": "",
+        "wordCount":  2519 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-01-12",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="bgfx WebGPU backend, second take!" />
+<meta property="og:description" content="Introduction What is bgfx? bgfx is cross-platform / API agnostic - render anywhere, effortlessly - rendering library. It occupies space just like WebGPU native, ANGLE or similar rendering libraries that provide cross-platform rendering. The key difference: bgfx is a mid-level library. Its core concept is a declarative API with draw call ordering via &ldquo;views&rdquo; - generalized rendering buckets where users define the purpose and order. It&rsquo;s higher-level than the backends it implements, yet not so high-level as to dictate concepts like pipelines, meshes, cameras, lights, or materials." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/webgpu/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-12T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-01-12T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="bgfx WebGPU backend, second take!"/>
+<meta name="twitter:description" content="Introduction What is bgfx? bgfx is cross-platform / API agnostic - render anywhere, effortlessly - rendering library. It occupies space just like WebGPU native, ANGLE or similar rendering libraries that provide cross-platform rendering. The key difference: bgfx is a mid-level library. Its core concept is a declarative API with draw call ordering via &ldquo;views&rdquo; - generalized rendering buckets where users define the purpose and order. It&rsquo;s higher-level than the backends it implements, yet not so high-level as to dictate concepts like pipelines, meshes, cameras, lights, or materials."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/webgpu/">
+    <link href="/style.min.c0bb708cea238e476644e7743fe25ba61a3e8f2b534f5dd1d57e843c68e62c7d.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">bgfx WebGPU backend, second take!</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-01-12T00:00:00&#43;00:00" itemprop="datePublished"> Jan 12, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#first-take">First take!</a></li>
+    <li><a href="#second-take">Second take!</a>
+      <ul>
+        <li><a href="#wgsl-webgpu-shading-language">WGSL (WebGPU Shading Language)</a></li>
+        <li><a href="#what-webgpu-got-wrong">What WebGPU got wrong</a></li>
+        <li><a href="#what-webgpu-got-right">What WebGPU got right</a></li>
+        <li><a href="#dawn--tint-bugs">Dawn &amp; Tint Bugs</a></li>
+        <li><a href="#building-dawn-native">Building Dawn Native</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>What is bgfx? bgfx is cross-platform / API agnostic - render anywhere, effortlessly - rendering library. It <a href="https://web.archive.org/web/20200503173204/https://kvark.github.io/web/gpu/native/2020/05/03/point-of-webgpu-native.html">occupies space just like WebGPU native</a>, ANGLE or similar rendering libraries that provide cross-platform rendering. The key difference: bgfx is a mid-level library. Its core concept is a declarative API with draw call ordering via &ldquo;views&rdquo; - generalized rendering buckets where users define the purpose and order. It&rsquo;s higher-level than the backends it implements, yet not so high-level as to dictate concepts like pipelines, meshes, cameras, lights, or materials.</p>
+<h2 id="first-take">First take!</h2>
+<p>bgfx got WebGPU backend implementation committed in the main repo in May of 2020. We could say bgfx was an early adopter of this technology. The original implementation was done by <a href="https://github.com/hugoam">Hugo Amnov</a> in this <a href="https://github.com/bkaradzic/bgfx/pull/2132">PR</a>.</p>
+<p>Hugo has been working on WebGPU for bgfx since early 2019.</p>
+<div align="center">
+<!-- ![https://x.com/hugoamnov/status/1119224299242565635](hugoamnov-1119224299242565635.png) -->
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">got <a href="https://twitter.com/hashtag/bgfx?src=hash&amp;ref_src=twsrc%5Etfw">#bgfx</a> running on top of <a href="https://twitter.com/hashtag/webgpu?src=hash&amp;ref_src=twsrc%5Etfw">#webgpu</a> native impl (aka google dawn) :)<br>(still rough first draft, need to add and check features one by one) <a href="https://t.co/xvdpW84CI7">pic.twitter.com/xvdpW84CI7</a></p>&mdash; Hugo Am (@hugoamnov) <a href="https://twitter.com/hugoamnov/status/1119224299242565635?ref_src=twsrc%5Etfw">April 19, 2019</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+</div>
+<p>By early 2020 he had bunch of examples working:</p>
+<div align="center">
+<!-- ![https://x.com/hugoamnov/status/1224060459936030721](hugoamnov-1224060459936030721.png) -->
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">The gist of the bgfx work is happening here:<a href="https://t.co/k44uIP0PAy">https://t.co/k44uIP0PAy</a><br>And there are also a bunch of other examples to try out:<a href="https://t.co/9USQt5h3rq">https://t.co/9USQt5h3rq</a><a href="https://t.co/GYN6XSuVVq">https://t.co/GYN6XSuVVq</a><a href="https://t.co/3VCLsQvGvW">https://t.co/3VCLsQvGvW</a> <a href="https://t.co/NsdZfrnt5A">pic.twitter.com/NsdZfrnt5A</a></p>&mdash; Hugo Am (@hugoamnov) <a href="https://twitter.com/hugoamnov/status/1224060459936030721?ref_src=twsrc%5Etfw">February 2, 2020</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+</div>
+<p>At that time it looked like WebGPU was about to be released within a year. WebGPU was in development for at least <a href="https://en.wikipedia.org/wiki/WebGPU#History">3-4 years</a>, and to me that seems enough time from the initial proposal to release in all major browsers. Oh boy, I was wrong with estimating how long it would take&hellip; 😂</p>
+<p>This was done pre-WGSL, and implementation used SPIR-V for shaders. The backend implementation used C++ headers. Implementation lacked some features but covered many examples in both native and browser. Over time, work on the backend ceased, and code was just waiting for some news about WebGPU progress, which was slow. After a longer period of inactivity, I <a href="https://github.com/bkaradzic/bgfx/pull/3198">removed</a> this implementation in November 2023 with the following justification:</p>
+<blockquote>
+<ul>
+<li>WebGPU not being ready in all browsers as of 11/2023.</li>
+<li>Code rot of code in bgfx due lack of maintainer (code not touched in 2+ years).</li>
+<li>Even if code is updated, there is no clear path from shaderc GLSL to WGSL.</li>
+</ul>
+</blockquote>
+<h2 id="second-take">Second take!</h2>
+<p>In early November 2025, I had some private conversations about WebGPU, and I was curious about the current state of Tint. It&rsquo;s been 2 years since the first bgfx WebGPU implementation was removed, and I already had a feeling that it might be a good time to reconsider it.</p>
+<div align="center">
+<!-- ![https://x.com/bkaradzic/status/1945406848930058308](bkaradzic-1945406848930058308.png) -->
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">It looks like 2026 is year when WebGPU will be finally available in all browsers... <a href="https://t.co/uya46YopaB">https://t.co/uya46YopaB</a></p>&mdash; Бранимир Караџић (@bkaradzic) <a href="https://twitter.com/bkaradzic/status/1945406848930058308?ref_src=twsrc%5Etfw">July 16, 2025</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+</div>
+<p>I got the latest Dawn and started looking through the Tint code and pretty quickly realized there was a <a href="https://github.com/google/dawn/blob/1beef0ee5577452926638b99181dc20e2ab611d6/src/tint/api/tint.h#L50-L51"><code>tint::SpirvToWgsl</code></a> library function. The next step was to try to hook up bgfx&rsquo;s shaderc and spit out WGSL. It all went pretty smoothly, at which point I realized that some of the issues we had with the original implementation might not be issues anymore, and it might be a good time to start adding back the WebGPU backend. I started immediately stripping Tint to the minimum needed for bgfx&rsquo;s shaderc to use this SPIR-V to WGSL translation. And the end result is a shader compiler Frankenstein: bgfx&rsquo;s flavor of GLSL -&gt; preprocessor + patching -&gt; HLSL -&gt; GLSLang -&gt; SPIR-Cross -&gt; Tint -&gt; WGSL. I already had a new implementation of WebGPU up and running when the good news <a href="https://web.archive.org/web/20251125184144/https://web.dev/blog/webgpu-supported-major-browsers">&ldquo;WebGPU is now supported in major browsers&rdquo;</a> came out.</p>
+<p>Unlike the first take WebGPU backend, I choose to use C instead of C++ headers. I find C headers generally simpler and cleaner. When I start writing each backend, I usually base it off of some existing backend. With WebGPU I based it off of D3D12, but during development I realized D3D11 or Metal might be a better choice. Even though some people compare WebGPU with Vulkan, I would put it closer to Metal and D3D11 or D3D12 than Vulkan. Similarities with Vulkan probably come from some basic Instance/Device initialization details or the way structure extensions are chained.</p>
+<h3 id="wgsl-webgpu-shading-language">WGSL (WebGPU Shading Language)</h3>
+<p>WGSL has drawn considerable criticism over time, but personally, I only dislike its syntax-everything else seems reasonable. Text as an intermediate representation (IR) is perfectly fine, and I fully agree with this statement from the conclusion of the <a href="https://web.archive.org/web/20210520210926/https://kvark.github.io/spirv/2021/05/01/spirv-horrors.html#:~:text=SPIR-V%20is%20probably%20a%20good,of%20your%20shaders">Horrors of SPIR-V</a> article justifying WGSL:</p>
+<blockquote>
+<p>SPIR-V is probably a good format for what it was made for: driver compilers. It’s not as good for the intermediate portable representations of your shaders.</p>
+</blockquote>
+<p>“Another shading language” argument against WGSL is also quite a weak argument, since there is no common agreement on shading language. HLSL actually is becoming the de facto standard thanks to the <a href="https://github.com/KhronosGroup/glslang">glslang</a> and <a href="https://github.com/KhronosGroup/SPIRV-Cross">SPIRV-Cross</a> libraries. Right now, it is possible to go from HLSL to any IR.</p>
+<div align="center">
+<!-- ![https://x.com/bkaradzic/status/1613925328011038721](bkaradzic-1613925328011038721.png) -->
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Users of graphics APIs are forced to make their own common shader language on top of what API accepts if they want to be x-platform. We already have ESSL, GLSL (many flavors), HLSL3/5/6, Metal, SPIR-V, PSSL, etc. so WebGPU guys adding another one is really not a big deal.</p>&mdash; Бранимир Караџић (@bkaradzic) <a href="https://twitter.com/bkaradzic/status/1613925328011038721?ref_src=twsrc%5Etfw">January 13, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+</div>
+<p>I personally think that textual IR for shaders is actually not much different than binary representation; at least it’s not pretending that it’s something that drivers can directly consume like DXBC, DXIL or SPIR-V. All IR would be parsed and recompiled by the driver. Only on video game consoles, where you can actually produce shader binary that the GPU would directly consume after minimal validation, would this textual IR cause big problems, but on PC, where parsing and recompiling happens, it’s a non-issue. One big benefit of textural IR is that shaders can be trivially generated at runtime. Projects like <a href="https://github.com/aras-p/glsl-optimizer?">glsl-optimizer</a> showed that the sane way to deal with textual IR is not to pass directly user-authored shaders but rather to pass compiled shader source that had optimization passes, and represent the minimum code required for the shader.</p>
+<h3 id="what-webgpu-got-wrong">What WebGPU got wrong</h3>
+<ul>
+<li>
+<p>Versioning header files: There are 4 different webgpu.h headers. wgpu-native is using a webgpu.h from 2 years ago. Dawn is using 2 different ones: one is generated with the latest, and there is one in the 3rdparty directory from 7 months ago. Emscripten, depending on the version, has a few years&rsquo; old header, and the latest doesn’t have any. However, there is another version of Emscripten in Dawn&hellip; It&rsquo;s really chaotic without any way to programmatically detect which one is which. As of now, bgfx is locked to the Dawn implementation, native only, and it’s not possible to use wgpu-native, nor the official Emscripten release. I plan to address this in the future, but I&rsquo;m hoping that at some point they will just align to a common subset, so that I don’t have to do ifdefery based on which implementation is targeted.</p>
+</li>
+<li>
+<p>Texture format chaos: <a href="https://www.w3.org/TR/webgpu/#texture-formats-tier1">Tier1</a>, <a href="https://www.w3.org/TR/webgpu/#texture-formats-tier2">Tier2</a>, <a href="https://www.w3.org/TR/webgpu/#rg11b10ufloat-renderable">RG10B10UfloatRenderable</a>, <a href="https://www.w3.org/TR/webgpu/#depth32float-stencil8">Depth3DFStencil8</a>, etc. Then you have to read specs to understand what formats can do what with each &ldquo;feature.&rdquo; It would be better, even if we have to request these formats on device creation, if there is an API call that spits out a table of what formats are supported and what the format capabilities are so that we can do this programmatically instead of reading specs. This is like the worst idea from OpenGL texture extension hell.</p>
+</li>
+<li>
+<p>W3C also picked the worst extension method of chaining structures introduced by Vulkan. This forces all structures to have <code>.nextInChain</code> at the beginning of the struct. From my POV, this approach is majorly flawed. Foremost, not everything will be extended, and we might see cases where it&rsquo;s never used, or for those things that do get many revisions, where the original struct is just there to provide <code>.nextInChain</code> pointer. Second, it&rsquo;s not obvious from the header file what can be chained where, and parsing specs/docs is required to understand the relationship. Direct3D&rsquo;s COM deals with this in a much better way with versioning structs, and providing extension methods for each version while providing backward compatibility by keeping previous version functionality.</p>
+</li>
+<li>
+<p>The API has reference counting, but no way to inspect the current count via API. This wouldn&rsquo;t be bad if at least at shutdown we got a validation error if there are still some references alive with a hint which ones are leaking.</p>
+</li>
+<li>
+<p>There are some APIs that are overkill in terms of the variable size they take. For example, <code>WGPUColor</code> is using doubles for RGB values. Then <code>size_t</code> appears in a lot of APIs where the maximum value is way below the <code>size_t</code> limit; even an 8-bit or 16-bit value would be sufficient.</p>
+</li>
+<li>
+<p>Not providing a way to clear the framebuffer that respects viewport and scissor settings, you only get functionality to clear the whole framebuffer. While this is obviously good enough for most cases, it&rsquo;s really annoying when you need to do a partial clear, and suddenly you have to add more shaders to your app just to do the clear. bgfx deals with this anyway, since different backends require it, but W3C should at least just add the equivalent of <code>ClearRenderTargetView</code> from D3D12.</p>
+</li>
+<li>
+<p>In some cases, mapping too much 1:1 WebGPU to the underlying API. For example, <code>wgpuRenderPassEncoderDrawIndirect</code> and <code>wgpuRenderPassEncoderDrawIndexedIndirect</code> are mapped to exactly the arguments D3D11 would expect. But the addition of two more arguments, indirect call stride, and number of indirect calls inside buffer, would save on validation on multiple calls when there is more than one indirect call in the indirect buffer.</p>
+</li>
+</ul>
+<h3 id="what-webgpu-got-right">What WebGPU got right</h3>
+<ul>
+<li>
+<p>Simplified buffer and texture management API. WebGPU has the simplest way to deal with textures and buffers, to the point that, for example, <a href="https://bkaradzic.github.io/bgfx/bgfx.html#blit"><code>bgfx::blit</code></a> maps almost 1:1 to WebGPU&rsquo;s implementation of copy between textures. The only annoying thing about texture API structures is the <code>WGPUTextureAspect</code> field that has some niche use case, but it&rsquo;s omnipresent in all structs dealing with texture.</p>
+</li>
+<li>
+<p>Use of WGPUStringView, and <code>.labels</code> by default everywhere, helping debuggability.</p>
+</li>
+<li>
+<p>Validation. While in some cases it&rsquo;s too strict, overall it&rsquo;s a great help when developing for WebGPU from scratch. If you use <code>webgpu_native.dll</code> built with debug info, you can set the <code>DAWN_DEBUG_BREAK_ON_ERROR</code> environment variable, which will break on the exact validation problem you are experiencing, and you will be able to fix any issue without guessing.</p>
+<p>In some cases, validation is complaining about a specific setting while there are not multiple alternatives, and WebGPU could just internally make the correct fix. Examples of this are filterable/non-filterable texture formats, where the sampler must be set at point/nearest sampling, and the sampler type must be set to NonFilteringFloat. So the user has to track this in three different locations even though setting the texture format at one place would be sufficient for WebGPU to do the right thing.</p>
+<p>The other thing on top of my head is blend mode. Once you set the blend equation to min or max, both srcFactor and dstFactor must be <code>one</code> or <code>undefined</code> to pass validation. Really, who cares what&rsquo;s there if <code>undefined</code> is an acceptable setting?!</p>
+<p>API validation is generally good, especially when resource names are provided by the user. There are only a few cases where validation messages are useless, for example:</p>
+<p><code>[Invalid Command Buffer] is invalid. - While calling [Queue].Submit([[Invalid CommandBuffer]])</code></p>
+<p><code>The shader's texture sample type (TextureSampleType::Depth) isn't compatible with the layout's texture sample type (TextureSampleType::Float) (it is only compatible with TextureSampleType::Float for the shader texture sample type).</code></p>
+</li>
+</ul>
+<h3 id="dawn--tint-bugs">Dawn &amp; Tint Bugs</h3>
+<p>There are a few bugs I discovered while working with Dawn:</p>
+<ul>
+<li>
+<p>Tint fails to translate SPIR-V that uses RG8 and R16F image formats in compute shaders.<br>
+<a href="https://issues.chromium.org/issues/471177483">https://issues.chromium.org/issues/471177483</a></p>
+</li>
+<li>
+<p>WGPUFeatureName_R8UnormStorage is not working as expected, and requires enabling ChromiumInternalGraphite feature.<br>
+<a href="https://issues.chromium.org/issues/471492268">https://issues.chromium.org/issues/471492268</a></p>
+</li>
+<li>
+<p>DrawIndirect validation is making assuptions about indirecBufferOffset and breaks draw indirect draw calls.<br>
+<a href="https://issues.chromium.org/issues/472821119">https://issues.chromium.org/issues/472821119</a></p>
+<p>This was totally my fault. I didn&rsquo;t realize I have to turn on <code>WGPUFeatureName_IndirectFirstInstance</code> if the compute shader is using anything other than 0 for the <code>firstInstance</code> argument of indirect draw that&rsquo;s written into indirect buffer.</p>
+</li>
+<li>
+<p>FXC failure &ldquo;error X3511: unable to unroll loop&rdquo;<br>
+<a href="https://issues.chromium.org/issues/474763965">https://issues.chromium.org/issues/474763965</a></p>
+</li>
+</ul>
+<p>Dawn on macOS occasionally fails to render one of the passes (usually ImGui). I haven&rsquo;t identified the cause, but since it doesn&rsquo;t occur on Windows or Linux, no validation errors are thrown, and it looks correct when the pass doesn&rsquo;t disappear-with no differences in bgfx&rsquo;s WebGPU backend code, I suspect it&rsquo;s a Dawn issue but need to investigate some more before submitting the issue.</p>
+<h3 id="building-dawn-native">Building Dawn Native</h3>
+<p>bgfx repo doesn&rsquo;t have Dawn native shared libraries, so user needs to build them if they wish to use WebGPU backend. Building is quite straight forward.</p>
+<pre><code>git clone https://dawn.googlesource.com/dawn
+cd dawn
+python tools/fetch_dawn_dependencies.py
+
+cd build
+cmake -DDAWN_BUILD_MONOLITHIC_LIBRARY=SHARED -DCMAKE_BUILD_TYPE=Release ..
+</code></pre>
+<p>Then depending on platform invoke <code>make</code> on Linux and macOS or open <code>dawn.slnx</code> file in VS on Windows.</p>
+<p>After the build shared library is located in</p>
+<pre><code>build/src/dawn/native/libwebgpu_dawn.*
+</code></pre>
+<p>Copy file to bgfx/examples/runtime directory. On Linux set <code>LD_LIBRARY_PATH=.</code> enviroment variable.</p>
+<p>Or follow steps &ldquo;Without depot_tools&rdquo; here:<br>
+<a href="https://github.com/google/dawn/blob/main/docs/building.md#without-depot_tools">https://github.com/google/dawn/blob/main/docs/building.md#without-depot_tools</a></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>While bgfx already supports the platforms and graphics APIs that native WebGPU targets, integrating WebGPU offers the obvious benefit of compatibility with the modern browser GPU API. Less apparent advantages include long-term support from major companies like Google, much like OpenGL ES via ANGLE is ubiquitous, WebGPU via Dawn and gfx-rs should endure for years. Just as WebGL dominated cross-platform graphics for the past 15 years, I anticipate WebGPU claiming that role for the next 15 years. It wouldn&rsquo;t surprise me if native WebGPU emerges at the driver level, at least on Linux. This aids long-shelf-life applications and games built with bgfx: developers could eventually drop native backends and rely solely on WebGPU to span multiple OS generations without retesting graphics code across APIs. Another subtle benefit is establishing WebGPU as bgfx&rsquo;s new minimum-spec renderer, enabling compute shaders everywhere. For aspiring graphics programmers, WebGPU serves as a solid alternative to the classic &ldquo;Learn OpenGL&rdquo; path, offering a gentle browser-based environment for initial steps before transitioning to native development.</p>
+<p>As of this writing in January 2026, WebGPU isn&rsquo;t quite ready yet. While all major browsers support it, lingering issues remain with inconsistent implementations, building for different targets, and more. I expect these to resolve within the year. 🤞</p>
+<p>Some might think bgfx is not needed with native WebGPU available. In the 13+ years of bgfx&rsquo;s existence as open source, I&rsquo;ve seen such comments repeatedly; they arise with each new API promising effortless cross-platform magic, from ANGLE to Vulkan and now WebGPU. Yet bgfx endures because these &ldquo;standardized&rdquo; APIs often fall short: not truly cross-platform, too rigid in standards that ignore platform-specific performance, bulky and hard to port to NDA platforms, inflexible with emerging APIs, and more. Ultimately, bgfx&rsquo;s core strength is its higher-level graphics library, providing a far simpler API than most low-level alternatives.</p>
+</br>
+<div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+<p>
+    <p>
+        <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+    </p>
+    <p></br>
+    My mission with bgfx is to empower game developers by providing a cross-platform,
+    graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+    ensuring seamless performance and compatibility without engine lock-in.</br>
+    </br>
+    If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
+    </p>
+</div>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

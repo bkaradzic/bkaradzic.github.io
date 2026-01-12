@@ -6,7 +6,18 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 12 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>bgfx WebGPU backend, second take!</title>
+      <link>https://bkaradzic.github.io/posts/webgpu/</link>
+      <pubDate>Mon, 12 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/webgpu/</guid>
+      
+      <description>Introduction What is bgfx? bgfx is cross-platform / API agnostic - render anywhere, effortlessly - rendering library. It occupies space just like WebGPU native, ANGLE or similar rendering libraries that provide cross-platform rendering. The key difference: bgfx is a mid-level library. Its core concept is a declarative API with draw call ordering via &amp;ldquo;views&amp;rdquo; - generalized rendering buckets where users define the purpose and order. It&amp;rsquo;s higher-level than the backends it implements, yet not so high-level as to dictate concepts like pipelines, meshes, cameras, lights, or materials.</description>
+      
+    </item>
+    
     <item>
       <title>Fast Call-Stack Backtrace</title>
       <link>https://bkaradzic.github.io/posts/fast-call-stack-backtrace/</link>
