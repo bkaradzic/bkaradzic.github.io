@@ -53,7 +53,7 @@
         },
         "datePublished": "2026-01-12",
         "description": "",
-        "wordCount":  2519 ,
+        "wordCount":  2468 ,
         "mainEntityOfPage": "True",
         "dateModified": "2026-01-12",
         "image": {
@@ -360,21 +360,21 @@ cmake -DDAWN_BUILD_MONOLITHIC_LIBRARY=SHARED -DCMAKE_BUILD_TYPE=Release ..
 <p>While bgfx already supports the platforms and graphics APIs that native WebGPU targets, integrating WebGPU offers the obvious benefit of compatibility with the modern browser GPU API. Less apparent advantages include long-term support from major companies like Google, much like OpenGL ES via ANGLE is ubiquitous, WebGPU via Dawn and gfx-rs should endure for years. Just as WebGL dominated cross-platform graphics for the past 15 years, I anticipate WebGPU claiming that role for the next 15 years. It wouldn&rsquo;t surprise me if native WebGPU emerges at the driver level, at least on Linux. This aids long-shelf-life applications and games built with bgfx: developers could eventually drop native backends and rely solely on WebGPU to span multiple OS generations without retesting graphics code across APIs. Another subtle benefit is establishing WebGPU as bgfx&rsquo;s new minimum-spec renderer, enabling compute shaders everywhere. For aspiring graphics programmers, WebGPU serves as a solid alternative to the classic &ldquo;Learn OpenGL&rdquo; path, offering a gentle browser-based environment for initial steps before transitioning to native development.</p>
 <p>As of this writing in January 2026, WebGPU isn&rsquo;t quite ready yet. While all major browsers support it, lingering issues remain with inconsistent implementations, building for different targets, and more. I expect these to resolve within the year. 🤞</p>
 <p>Some might think bgfx is not needed with native WebGPU available. In the 13+ years of bgfx&rsquo;s existence as open source, I&rsquo;ve seen such comments repeatedly; they arise with each new API promising effortless cross-platform magic, from ANGLE to Vulkan and now WebGPU. Yet bgfx endures because these &ldquo;standardized&rdquo; APIs often fall short: not truly cross-platform, too rigid in standards that ignore platform-specific performance, bulky and hard to port to NDA platforms, inflexible with emerging APIs, and more. Ultimately, bgfx&rsquo;s core strength is its higher-level graphics library, providing a far simpler API than most low-level alternatives.</p>
-</br>
-<div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
-<p>
-    <p>
-        <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
-    </p>
-    <p></br>
-    My mission with bgfx is to empower game developers by providing a cross-platform,
-    graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
-    ensuring seamless performance and compatibility without engine lock-in.</br>
-    </br>
-    If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
-    </p>
-</div>
 
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
+                </p>
             </div>
         </article></main>
 </div>
