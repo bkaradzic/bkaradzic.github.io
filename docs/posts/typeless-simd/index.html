@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Making cross-platform SIMD code pleasant | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Making cross-platform SIMD code pleasant | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Making cross-platform SIMD code pleasant | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Making cross-platform SIMD code pleasant | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Making cross-platform SIMD code pleasant | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/typeless-simd/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-05-03T00:00:00Z />
+    <meta property="article:published_time" content=2026-05-03T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/typeless-simd/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Making cross-platform SIMD code pleasant",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-05-03",
+        "description": "",
+        "wordCount":  1511 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-05-03",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Making cross-platform SIMD code pleasant" />
+<meta property="og:description" content="Introduction Writing fast, portable SIMD (Single Instruction, Multiple Data) code has always been painful - verbose intrinsics, platform differences, and a type system that fights you at every step. After three major iterations, the bx library now has a much more pleasant solution.
+The bx library has had SIMD support since its initial commit, originally in the form of float4_t. A later major update renamed float4_t to simd128_t and added generics for the register-width type." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/typeless-simd/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-05-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-05-03T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Making cross-platform SIMD code pleasant"/>
+<meta name="twitter:description" content="Introduction Writing fast, portable SIMD (Single Instruction, Multiple Data) code has always been painful - verbose intrinsics, platform differences, and a type system that fights you at every step. After three major iterations, the bx library now has a much more pleasant solution.
+The bx library has had SIMD support since its initial commit, originally in the form of float4_t. A later major update renamed float4_t to simd128_t and added generics for the register-width type."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/typeless-simd/">
+    <link href="/style.min.6e36f9b3ef88664a08bdd73c5d56a2e1f35a6c54a7c6e08b921f46364caa181f.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Making cross-platform SIMD code pleasant</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-05-03T00:00:00&#43;00:00" itemprop="datePublished"> May 3, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#how-should-simd-code-be-written">How should SIMD code be written?</a></li>
+    <li><a href="#why-typeless">Why typeless?</a></li>
+    <li><a href="#bx-simd-naming-convention">bx SIMD naming convention</a></li>
+    <li><a href="#simd32_t-as-the-simdification-on-ramp"><code>simd32_t</code> as the SIMDification on-ramp</a></li>
+    <li><a href="#abi-considerations">ABI considerations</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>Writing fast, portable <a href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_data">SIMD (Single Instruction, Multiple Data)</a> code has always been painful - verbose <a href="https://en.wikipedia.org/wiki/Intrinsic_function">intrinsics</a>, platform differences, and a type system that fights you at every step. After three major iterations, the <a href="https://github.com/bkaradzic/bx#bx">bx library</a> now has a much more pleasant solution.</p>
+<p>The bx library has had SIMD support since its <a href="https://github.com/bkaradzic/bx/commit/4eb80393d11e4cfa65be28bc01057d51d99863a2#diff-5c4f7073eb8792c7b081e10bd217affa861267c6db904e4046d74ccf5ae99557">initial commit</a>, originally in the form of <code>float4_t</code>. A later <a href="https://github.com/bkaradzic/bx/commit/224e990ee4cbfdede21daa790970abebe141836c#diff-525cfe64c6f9487eba1592648cbeba17bdfd0d0182fc7f9388663e998e8a0345">major update</a> renamed <code>float4_t</code> to <code>simd128_t</code> and added generics for the register-width type. That interface still leaned too heavily on floating point and lacked a proper lane type - largely because commonly available SIMD features on CPUs at the time were heavily floating-point centric. I’ve now done a third pass. This post walks through the architectural decisions behind the resulting cross-platform typeless SIMD library in bx.</p>
+<p>If you’d rather skip the prose, the implementation lives <a href="https://github.com/bkaradzic/bx/blob/master/include/bx/simd_t.h">here</a>.</p>
+<h2 id="how-should-simd-code-be-written">How should SIMD code be written?</h2>
+<p>The single most important thing when SIMDifying code is changing the data layout so the SIMD processor can access data efficiently. That part is fundamentally cross-platform - the only thing that matters is the largest register width on the platforms you target. Just doing the layout change, before you touch a single intrinsic, often improves scalar performance too.</p>
+<p>You should always start from a plain-C/C++ reference implementation, and that reference implementation should stay up-to-date with the SIMD one. It&rsquo;s useful for unit-testing, for debugging when the platform-specific code does something surprising, and as living documentation for what each operation is actually supposed to do.</p>
+<p>For most use cases the reference plus a single cross-platform SIMD implementation is enough. If you have a hot inner loop that justifies the effort, you can add a third hand-tuned path for a specific CPU - but you shouldn&rsquo;t <strong>start</strong> there.</p>
+<p>Prefer static single-assignment (SSA) form, meaning <strong>each line is one SIMD op, producing one new <code>const</code>-named temporary</strong>. No reassignment, no nested calls.</p>
+<p>In practice that means, instead of:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>val <span style="color:#f92672">=</span> simd_or(val, simd_x32_srl(val, <span style="color:#ae81ff">1</span>));
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>val <span style="color:#f92672">=</span> simd_or(val, simd_x32_srl(val, <span style="color:#ae81ff">2</span>));
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>val <span style="color:#f92672">=</span> simd_or(val, simd_x32_srl(val, <span style="color:#ae81ff">4</span>));
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#75715e">// ...
+</span></span></span></code></pre></div><p>Where each line shadows the previous meaning of <code>val</code>, the operation order is hidden inside the nesting, and any debugger you point at it shows you a single name with eight different values along the way, we write:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> shr1 <span style="color:#f92672">=</span> simd_x32_srl(val, <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> or1  <span style="color:#f92672">=</span> simd_or(val, shr1);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> shr2 <span style="color:#f92672">=</span> simd_x32_srl(or1, <span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> or2  <span style="color:#f92672">=</span> simd_or(or1, shr2);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> shr4 <span style="color:#f92672">=</span> simd_x32_srl(or2, <span style="color:#ae81ff">4</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">auto</span> or4  <span style="color:#f92672">=</span> simd_or(or2, shr4);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span><span style="color:#75715e">// ...
+</span></span></span></code></pre></div><p>Every intermediate has a name, every name shows up exactly once on the left-hand side, and the dataflow reads top to bottom. The optimizer doesn&rsquo;t care - the same instructions come out either way.</p>
+<h2 id="why-typeless">Why typeless?</h2>
+<p>I&rsquo;d argue strong typing is detrimental to writing SIMD code. Real SIMD code constantly mixes integer and floating-point operations: compare instructions produce masks, masks get applied to lanes via bitwise ops, branchless code falls out of <code>selb(mask, a, b)</code>. Type punning between integer and floating-point views of the same register is unavoidable. The type system just gets in the way.</p>
+<p>SSE/AVX intrinsics are half-typed: there are only a few types (<code>__m128</code>/<code>__m128i</code>/<code>__m128d</code>), but the instructions still encode the lane type in their name (<code>_mm_add_ps</code> vs <code>_mm_add_epi32</code>). The type system gets you nothing except compile errors when you reach for the wrong intrinsic. NEON intrinsicsgoes further and makes every lane configuration a distinct type (<code>float32x4_t</code>, <code>int32x4_t</code>, <code>uint8x16_t</code>, &hellip;), with even more casting. Only WASM SIMD intrinsics took the sane path and dropped the types entirely - the instruction encodes the lane interpretation; the value is just a bag of bits, which is how the hardware sees it anyway.</p>
+<p>Hardware SIMD registers (XMM, YMM, NEON registers) really are just bags of bits. The instruction you execute on them decides how those bits are interpreted. Once you accept that, two things happen:</p>
+<ul>
+<li><strong>Reinterpret casts disappear.</strong> No more <code>_mm_castps_si128</code>, no <code>vreinterpretq_f32_u32</code>. The same <code>simd128_t</code> flows through <code>f32_add</code>, <code>u32_cmpgt</code>, <code>selb</code>, and back to <code>f32_mul</code>, with no syntactic ceremony in between.</li>
+<li><strong>The code reads like the algorithm.</strong> Type-punning steps that used to be noise just aren&rsquo;t there.</li>
+</ul>
+<h2 id="bx-simd-naming-convention">bx SIMD naming convention</h2>
+<pre><code>simd[register-width][_&lt;lane-type&gt;&lt;lane-type-width&gt;]_&lt;operation&gt;(...)
+
+&lt;&gt; - not optional
+[] - optional
+
+register-width: 32, 64, 128, 256
+    (omitted for width-generic templates to operate on any available register width)
+
+lane-type:
+    f - floating point
+    i - signed integer
+    u - unsigned integer
+    x - typeless bitwise
+
+lane-type-width: 8, 16, 32, 64
+
+    +----+----+----+----+----+----+----+----+- ~ -+----+
+    | 00 | 01 | 02 | 03 | 04 | 05 | 06 | 07 |  ~  | NN | bytes
+    +----+----+----+----+----+----+----+----+- ~ -+----+
+    |         register width 32, 64, 128, 256          |
+    +----+----+----+----+----+----+----+----+- ~  -----+
+    | u8 | u8 | u8 | u8 | u8 | u8 | u8 | u8 |  ~  ...  |
+    +----+----+----+----+----+----+----+----+- ~  -----+
+    |   u16   |   u16   |   u16   |   u16   |  ~  ...  |
+    +---------+---------+---------+---------+- ~  -----+
+    |        u32        |        u32        |  ~  ...  |
+    +-------------------+-------------------+- ~  -----+
+    |                  u64                  |  ~  ...  |
+    +---------------------------------------+- ~  -----+
+</code></pre>
+<p><code>simd32_f32_add</code> - arithmetic add on a 32-bit SIMD register with float components, i.e. a single float.
+<code>simd128_f32_add</code> - same as above, but on a 128-bit SIMD register, which holds 4 floats.
+<code>simd_f32_add</code> - width-generic implementation; the actual width depends on the SIMD type passed in. Most code should be written in this style, so it remains portable across all widths.</p>
+<h2 id="simd32_t-as-the-simdification-on-ramp"><code>simd32_t</code> as the SIMDification on-ramp</h2>
+<p><code>simd32_t</code> looks pointless at first - it&rsquo;s a single 32-bit lane, the same shape as a plain <code>uint32_t</code>. That&rsquo;s the point. It&rsquo;s not a width, it&rsquo;s a <strong>convention</strong>.</p>
+<p>When you take an existing piece of plain C/C++ and start SIMDifying it, the first stop is to retype the locals as <code>simd32_t</code> and rewrite the operations as <code>simd32_*</code> calls. The data layout doesn&rsquo;t change yet. What changes is that you&rsquo;re now thinking in lanes instead of values. Branches turn into masks, masks turn into <code>selb</code>. Once the code is written that way, widening from 32-bit to 128-bit is mostly a search-and-replace - you replace <code>simd32_t</code> with <code>simd128_t</code>, point the loops at four-element strides, and the operations carry over unchanged.</p>
+<p>In quite a few cases the rewrite to <code>simd32_t</code> is <strong>all</strong> you need to do - the result already runs perfectly fine on any width register, because nothing in the code cared about the width to begin with. That&rsquo;s the win: you get SIMD-shaped code in one step.</p>
+<h2 id="abi-considerations">ABI considerations</h2>
+<p>For native vector types (<code>__m128</code>, <code>__m256</code>, <code>float32x4_t</code>), pass-by-value is the fast path everywhere. They go straight into vector registers. Pass-by-reference forces a store-to-memory and load-via-pointer round trip, which is strictly worse.</p>
+<table>
+<thead>
+<tr>
+<th>ABI</th>
+<th><code>__m128</code> / <code>float32x4_t</code></th>
+<th><code>__m256</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSVC x64 (default)</td>
+<td>XMM0-XMM3 (4 regs)</td>
+<td>YMM0-YMM3 (4 regs)</td>
+</tr>
+<tr>
+<td>MSVC x64 (<code>__vectorcall</code>)</td>
+<td>XMM0-XMM5 (6 regs)</td>
+<td>YMM0-YMM5 (6 regs)</td>
+</tr>
+<tr>
+<td>GCC/Clang x64 (System V)</td>
+<td>XMM0-XMM7 (8 regs)</td>
+<td>YMM0-YMM7 (8 regs)</td>
+</tr>
+<tr>
+<td>ARM64 (AAPCS64)</td>
+<td>V0-V7 (8 regs)</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p><code>__vectorcall</code> is a real win on MSVC - 6 vector argument registers versus 4 with the default Microsoft x64 ABI. System V already gives you 8, no special calling convention needed.</p>
+<p>The <code>_ref</code> equivalents (the reference-backend POD structs) are different. <code>simd32_ref_t</code> and <code>simd64_ref_t</code> fit in a single GPR, and pass-by-value is optimal everywhere - same cost as passing a <code>uint32_t</code> or <code>uint64_t</code>. <code>simd128_ref_t</code> is where MSVC gets weird: System V will pass it in two GPRs, but MSVC&rsquo;s default x64 ABI silently converts any struct over 8 bytes to a hidden pointer, which means an implicit stack copy plus an indirection. <code>simd256_ref_t</code> ends up as a hidden pointer on every ABI; write it by-value or by-const-ref, the compiler does the same thing.</p>
+<p>When inlining happens - and for <code>_ref</code> functions it almost always does, since each one is <code>inline BX_CONSTEXPR_FUNC</code> or <code>BX_SIMD_FORCE_INLINE</code> - none of this matters; the compiler inlines them out of existence. ABI details only start to bite when inlining doesn&rsquo;t happen: function pointers, virtual dispatch, translation-unit and DLL boundaries.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>None of this is novel in isolation. Data-oriented layout changes, reference implementations, SSA-style coding, typeless registers, and ABI-aware abstractions have all appeared in one form or another across the SIMD landscape. What the new bx SIMD layer delivers is the combination of all these pieces into a single, coherent interface that simply feels good to write.</p>
+<p>By making the register a bag of bits, the naming convention predictable, and <code>simd32_t</code> a natural on-ramp, the library removes the friction that usually makes SIMD code painful. You spend your time thinking about the algorithm instead of fighting the type system or memorizing platform-specific intrinsics. The same code scales cleanly from a single lane to 256-bit registers, stays readable in the debugger, and performs well across ABIs without hidden costs.</p>
+<p>If you&rsquo;ve ever looked at a screen full of <code>_mm_castps_si128</code> calls and felt your enthusiasm drain away, give this approach a spin. The implementation is already merged and lives <a href="https://github.com/bkaradzic/bx/blob/master/include/bx/simd_t.h">here</a>. Drop <code>simd32_t</code> into a scalar hot path, widen it to simd128_t once the logic is clean, and watch the same code run faster on every platform you care about. SIMD doesn&rsquo;t have to be arcane. It&rsquo;s just data in lanes-and now the library gets out of your way so you can actually use it.</p>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

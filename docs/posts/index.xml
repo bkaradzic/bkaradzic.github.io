@@ -6,7 +6,19 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 12 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 03 May 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Making cross-platform SIMD code pleasant</title>
+      <link>https://bkaradzic.github.io/posts/typeless-simd/</link>
+      <pubDate>Sun, 03 May 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/typeless-simd/</guid>
+      
+      <description>Introduction Writing fast, portable SIMD (Single Instruction, Multiple Data) code has always been painful - verbose intrinsics, platform differences, and a type system that fights you at every step. After three major iterations, the bx library now has a much more pleasant solution.
+The bx library has had SIMD support since its initial commit, originally in the form of float4_t. A later major update renamed float4_t to simd128_t and added generics for the register-width type.</description>
+      
+    </item>
+    
     <item>
       <title>bgfx WebGPU backend, second take!</title>
       <link>https://bkaradzic.github.io/posts/webgpu/</link>

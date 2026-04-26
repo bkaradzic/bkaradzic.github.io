@@ -19,9 +19,9 @@ p > code {
   position: relative;
   top: -1px;
   color: $inline-code-text;
-  background-color: $inline-code-bg;
+  background-color: transparent;
   border-radius: 2px;
-  border: 1px solid rgba(128,128,128,0.1);
+  border: 0;
 }
 // Codeblock Theme
 pre {
