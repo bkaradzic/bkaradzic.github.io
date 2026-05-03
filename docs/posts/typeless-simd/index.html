@@ -53,7 +53,7 @@
         },
         "datePublished": "2026-05-03",
         "description": "",
-        "wordCount":  1511 ,
+        "wordCount":  1512 ,
         "mainEntityOfPage": "True",
         "dateModified": "2026-05-03",
         "image": {
@@ -245,7 +245,7 @@ stroke-linejoin="round" class="feather feather-home">
 </span></span></span></code></pre></div><p>Every intermediate has a name, every name shows up exactly once on the left-hand side, and the dataflow reads top to bottom. The optimizer doesn&rsquo;t care - the same instructions come out either way.</p>
 <h2 id="why-typeless">Why typeless?</h2>
 <p>I&rsquo;d argue strong typing is detrimental to writing SIMD code. Real SIMD code constantly mixes integer and floating-point operations: compare instructions produce masks, masks get applied to lanes via bitwise ops, branchless code falls out of <code>selb(mask, a, b)</code>. Type punning between integer and floating-point views of the same register is unavoidable. The type system just gets in the way.</p>
-<p>SSE/AVX intrinsics are half-typed: there are only a few types (<code>__m128</code>/<code>__m128i</code>/<code>__m128d</code>), but the instructions still encode the lane type in their name (<code>_mm_add_ps</code> vs <code>_mm_add_epi32</code>). The type system gets you nothing except compile errors when you reach for the wrong intrinsic. NEON intrinsicsgoes further and makes every lane configuration a distinct type (<code>float32x4_t</code>, <code>int32x4_t</code>, <code>uint8x16_t</code>, &hellip;), with even more casting. Only WASM SIMD intrinsics took the sane path and dropped the types entirely - the instruction encodes the lane interpretation; the value is just a bag of bits, which is how the hardware sees it anyway.</p>
+<p>SSE/AVX intrinsics are half-typed: there are only a few types (<code>__m128</code>/<code>__m128i</code>/<code>__m128d</code>), but the instructions still encode the lane type in their name (<code>_mm_add_ps</code> vs <code>_mm_add_epi32</code>). The type system gets you nothing except compile errors when you reach for the wrong intrinsic. NEON intrinsics goes further and makes every lane configuration a distinct type (<code>float32x4_t</code>, <code>int32x4_t</code>, <code>uint8x16_t</code>, &hellip;), with even more casting. Only WASM SIMD intrinsics took the sane path and dropped the types entirely - the instruction encodes the lane interpretation; the value is just a bag of bits, which is how the hardware sees it anyway.</p>
 <p>Hardware SIMD registers (XMM, YMM, NEON registers) really are just bags of bits. The instruction you execute on them decides how those bits are interpreted. Once you accept that, two things happen:</p>
 <ul>
 <li><strong>Reinterpret casts disappear.</strong> No more <code>_mm_castps_si128</code>, no <code>vreinterpretq_f32_u32</code>. The same <code>simd128_t</code> flows through <code>f32_add</code>, <code>u32_cmpgt</code>, <code>selb</code>, and back to <code>f32_mul</code>, with no syntactic ceremony in between.</li>
