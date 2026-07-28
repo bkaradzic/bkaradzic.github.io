@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Parsers don’t have to be complicated | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Parsers don’t have to be complicated | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Parsers don’t have to be complicated | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Parsers don’t have to be complicated | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Parsers don’t have to be complicated | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/scanner/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-07-27T00:00:00Z />
+    <meta property="article:published_time" content=2026-07-27T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/scanner/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Parsers don’t have to be complicated",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-07-27",
+        "description": "",
+        "wordCount":  1673 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-07-27",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Parsers don’t have to be complicated" />
+<meta property="og:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
+It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/scanner/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-07-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-07-27T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Parsers don’t have to be complicated"/>
+<meta name="twitter:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
+It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/scanner/">
+    <link href="/style.min.6e36f9b3ef88664a08bdd73c5d56a2e1f35a6c54a7c6e08b921f46364caa181f.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Parsers don’t have to be complicated</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-07-27T00:00:00&#43;00:00" itemprop="datePublished"> Jul 27, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#design">Design</a>
+      <ul>
+        <li><a href="#linereader-the-simplest-helper">LineReader, the simplest helper</a></li>
+        <li><a href="#ini-parsing-and-sub-scanners">INI parsing, and sub-scanners</a></li>
+        <li><a href="#url-parsing-and-what-empty-means">URL parsing and what empty means</a></li>
+        <li><a href="#file-path-normalization">File path normalization</a></li>
+        <li><a href="#stack-trace-symbolication">Stack trace symbolication</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>Years ago I started writing a proper shader front-end parser for bgfx and used the <a href="https://sqlite.org/lemon.html">Lemon parser generator</a>.</p>
+<p>It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</p>
+<p>On the other side of the spectrum I kept writing ad-hoc parsers for smaller things where using something like Lemon was overkill. Pointer arithmetic, manual loops over characters, a handful of <code>strchr/strncmp</code> style calls, some state variables, and a hope that I hadn’t missed an edge case. These were fast and had no dependencies, but they always ended up repeating the same patterns: skipping whitespace, collecting identifiers, tracking line numbers for error messages, handling the inevitable off-by-one when the input wasn’t perfectly formed. Each new parser became its own little minefield of one-off bugs, and every new thing that needed parsing got its own private copy of them.</p>
+<p>Most of this ad-hoc parsing code looked roughly like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> pos <span style="color:#f92672">=</span> input.getPtr();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> end <span style="color:#f92672">=</span> input.getTerm();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#66d9ef">while</span> (pos <span style="color:#f92672">&lt;</span> end
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>   <span style="color:#f92672">&amp;&amp;</span>  bx<span style="color:#f92672">::</span>isSpace(<span style="color:#f92672">*</span>pos) )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    <span style="color:#f92672">++</span>pos;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> start <span style="color:#f92672">=</span> pos;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span><span style="color:#66d9ef">while</span> (pos <span style="color:#f92672">&lt;</span> end
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>   <span style="color:#f92672">&amp;&amp;</span> (bx<span style="color:#f92672">::</span>isAlphaNum(<span style="color:#f92672">*</span>pos) <span style="color:#f92672">||</span> <span style="color:#f92672">*</span>pos <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;_&#39;</span>) )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>    <span style="color:#f92672">++</span>pos;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>bx<span style="color:#f92672">::</span>StringView ident(start, pos);
+</span></span></code></pre></div><p>Multiply that pattern by every token type, add manual line counting, add handling for <code>\r\n</code> versus <code>\n</code>, and you have the classic ad-hoc scanner. It works and it is fast. I’ll leave it to the reader’s imagination how the same logic would look after someone decided it needed to be &ldquo;modern&rdquo; and rewrote it with Boost.Spirit.</p>
+<p>What I wanted was something in between: a small set of reusable primitives that took care of the repetitive parts of scanning without dragging in a generator or a dependency graph. Zero-copy, allocation-free, and readable in a debugger. That is what <a href="https://github.com/bkaradzic/bx/blob/056ea3486cb6aca02f2344111661e4e8f88ebb2c/include/bx/scanner.h#L13-L25">bx::Scanner</a> is. It is not a parser generator and not a Parsing Expression Grammars (PEG) library, and it is not trying to become either.</p>
+<h2 id="design">Design</h2>
+<p><code>bx::Scanner</code> is built around a small set of deliberate constraints:</p>
+<ul>
+<li>
+<p><strong>Zero-copy and non-owning.</strong>
+The scanner never allocates and never copies text. Every result is a <code>StringView</code> that points directly into the original input, including the empty ones, which point at the cursor rather than at nothing.</p>
+</li>
+<li>
+<p><strong>One cursor, and it never moves on its own.</strong>
+A single current position. <code>accept</code> / <code>acceptWhile</code> / <code>acceptUntil</code> move it forward. <code>peek</code> runs the same test without moving. <code>seek</code> and <code>reset</code> exist, but nothing backtracks implicitly.</p>
+</li>
+<li>
+<p><strong>Built-in line and column tracking.</strong>
+Any movement across a newline updates the line number, including a backwards <code>seek</code>. <code>getLine</code> and <code>getColumn</code> are always available and both are one-based, which makes decent error messages nearly free.</p>
+</li>
+<li>
+<p><strong>Character classes instead of a mini-language.</strong>
+A handful of classes (<code>Class::Space</code>, <code>Class::NonSpace</code>, <code>Class::Identifier</code>, <code>Class::EndOfLine</code>, <code>Class::NewLine</code>) cover most everyday scanning. Anything more specific is an ordinary <code>bool(*)(char)</code> predicate handed to <code>accept</code> / <code>acceptWhile</code>. There is no pattern language to learn, and nothing to debug except your own function.</p>
+</li>
+<li>
+<p><strong>Tiny surface area.</strong>
+The whole public interface fits in one small header.</p>
+</li>
+</ul>
+<p>The workflow is always the same: construct a <code>Scanner</code> over a <code>StringView</code>, then <code>peek</code> and <code>accept</code> until you are done.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>bx<span style="color:#f92672">::</span>Scanner scanner(input);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#75715e">// Skip leading whitespace.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#75715e"></span>scanner.accept(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>Space);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span><span style="color:#75715e">// Read an identifier.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView ident <span style="color:#f92672">=</span> scanner.accept(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>Identifier);
+</span></span></code></pre></div><p><code>accept</code> consumes matching text and returns it as a <code>StringView</code>. If the expected token is not there it returns an empty view and leaves the cursor alone, so you can go try the next alternative. <code>peek</code> runs the same test without moving.</p>
+<p><code>StringView</code> has no <code>operator bool</code>, so a successful match reads as <code>!scanner.accept('=').isEmpty()</code>. Noisier than returning a <code>bool</code>, but the matched text comes back with the answer instead of requiring a second call to go get it.</p>
+<p>Here is how it is actually used in <code>bx</code> today.</p>
+<h3 id="linereader-the-simplest-helper">LineReader, the simplest helper</h3>
+<p><code>LineReader</code> splits input into lines, handles <code>\n</code> and <code>\r\n</code>, and trims the stray trailing <code>\r</code> that malformed input likes to leave behind:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">for</span> (bx<span style="color:#f92672">::</span>LineReader lr(fileContents); <span style="color:#f92672">!</span>lr.isDone(); )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView line <span style="color:#f92672">=</span> lr.next();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>    <span style="color:#75715e">// `line` excludes the terminator, and lr.getLine() is its line number.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Note the loop condition. The obvious-looking <code>while (!lr.next().isEmpty() )</code> is wrong. A file can contain a blank line, and that blank line is a valid result. Empty means &ldquo;this line has no characters&rdquo;, not &ldquo;there are no more lines&rdquo;, so the exhaustion test has to be <code>isDone</code>.</p>
+<h3 id="ini-parsing-and-sub-scanners">INI parsing, and sub-scanners</h3>
+<p>This one replaced a third-party INI library outright. A <code>Scanner</code> is constructed from a <code>StringView</code> and <code>acceptUntil</code> returns a <code>StringView</code>, so a single line can become its own scanner:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>bx<span style="color:#f92672">::</span>Scanner scanner(data);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>scanner.isDone() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>    scanner.accept(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>Space);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    <span style="color:#75715e">// One line, as its own scanner. Nothing below can run past the end of
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span><span style="color:#75715e"></span>    <span style="color:#75715e">// the line, no matter how malformed the line turns out to be.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span><span style="color:#75715e"></span>    bx<span style="color:#f92672">::</span>Scanner line(scanner.acceptUntil(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>EndOfLine) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>line.accept(<span style="color:#e6db74">&#39;;&#39;</span>).isEmpty() )   <span style="color:#75715e">// Line comment.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>        <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>line.accept(<span style="color:#e6db74">&#39;[&#39;</span>).isEmpty() )   <span style="color:#75715e">// [section] header.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>        line.accept(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>Space);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>        <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView name <span style="color:#f92672">=</span> bx<span style="color:#f92672">::</span>strRTrimSpace(line.acceptUntil(<span style="color:#e6db74">&#34;]&#34;</span>) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>line.accept(<span style="color:#e6db74">&#39;]&#39;</span>).isEmpty()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>        <span style="color:#f92672">&amp;&amp;</span>  <span style="color:#f92672">!</span>name.isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>        {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>            section <span style="color:#f92672">=</span> addSection(name);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>        }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span>        <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span>    <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView name <span style="color:#f92672">=</span> bx<span style="color:#f92672">::</span>strRTrimSpace(line.acceptUntil(<span style="color:#e6db74">&#34;=&#34;</span>) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span><span>    <span style="color:#66d9ef">if</span> (line.accept(<span style="color:#e6db74">&#39;=&#39;</span>).isEmpty()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span>    <span style="color:#f92672">||</span>  name.isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span><span>        <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span><span>    line.accept(bx<span style="color:#f92672">::</span>Scanner<span style="color:#f92672">::</span>Class<span style="color:#f92672">::</span>Space);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span><span>    setProperty(section, name, bx<span style="color:#f92672">::</span>strRTrimSpace(line.acceptAll() ) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span><span>}
+</span></span></code></pre></div><p>The sub-scanner is doing real work here. In the ad-hoc version, the bug you write is always the same one: some malformed line is missing its <code>]</code> or its newline, and the parser happily runs into the following lines looking for it. Bounding the inner scanner to a single line makes &ldquo;run past the end of a malformed line&rdquo; unrepresentable rather than merely unlikely.</p>
+<h3 id="url-parsing-and-what-empty-means">URL parsing and what empty means</h3>
+<p>Because a match comes back as a <code>StringView</code> and not a <code>bool</code>, &ldquo;matched nothing&rdquo; and &ldquo;didn&rsquo;t match&rdquo; arrive as the same value. <code>acceptUntil</code> is where this is most visible: it returns empty both when <code>_find</code> isn&rsquo;t in the input at all and when <code>_find</code> is already sitting at the cursor, and in neither case does the cursor move.</p>
+<p>Most of the time that collapse is the answer you wanted rather than something to work around. An empty token is a legitimate token: <code>http://example.com</code> has no path, and most URLs have no userinfo. Since the empty view still points at the cursor, it is a zero-length slice of the input rather than a hole, so it can go straight into the result:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView authority <span style="color:#f92672">=</span> scanner.acceptWhile(isNotSlash);
+</span></span></code></pre></div><p>It only matters when the <em>structure</em> depends on whether a delimiter was there, and then the token is the wrong thing to ask. Ask the input instead, with <code>accept</code> if you want to consume the delimiter or <code>peek</code> if you don&rsquo;t.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>bx<span style="color:#f92672">::</span>Scanner scanner(url);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView scheme <span style="color:#f92672">=</span> scanner.acceptUntil(<span style="color:#e6db74">&#34;://&#34;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span><span style="color:#75715e">// `scheme` is empty for &#34;/tmp/file&#34; and for &#34;://host&#34; alike, so the
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#75715e">// question of whether there was a scheme is asked separately.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">bool</span> hasScheme <span style="color:#f92672">=</span> <span style="color:#f92672">!</span>scanner.accept(<span style="color:#e6db74">&#34;://&#34;</span>).isEmpty();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span><span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView authority <span style="color:#f92672">=</span> scanner.acceptWhile(isNotSlash);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">bool</span> hasPath <span style="color:#f92672">=</span> <span style="color:#f92672">!</span>scanner.peek(<span style="color:#e6db74">&#39;/&#39;</span>).isEmpty();
+</span></span></code></pre></div><p>Rule of thumb: the return value is the token; <code>peek</code> or <code>accept</code> answers the structural question &ldquo;was the delimiter present?&rdquo;. When a single return value is not enough-when a token is assembled from several accepts <code>getCursor</code> and <code>between</code> capture the full span.</p>
+<p>Total <a href="https://github.com/bkaradzic/bx/blob/0b001f5f36579e8aea07efa5af139ca18dad9505/src/url.cpp#L48-L123">75 lines of code</a> to parse URL, not 23k lines of C++ header files&hellip;</p>
+<div align="center">
+<!-- <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Yeah don&#39;t do 200 lines hand rolled line splitting, when you can include 72 line include file that includes 55 other files, that include total of 23k lines of code in 199 header files.<a href="https://t.co/rTulqPOXyD">https://t.co/rTulqPOXyD</a> <a href="https://t.co/o8LlImtqml">https://t.co/o8LlImtqml</a></p>&mdash; Бранимир Караџић (@bkaradzic) <a href="https://x.com/bkaradzic/status/2077995321175794008?ref_src=twsrc%5Etfw">July 17, 2026</a></blockquote>
+<script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+
+ -->
+<a href="https://x.com/bkaradzic/status/2077995321175794008">
+<img src="bkaradzic-2077995321175794008.png" alt="https://x.com/bkaradzic/status/2077995321175794008">
+</a>
+</div>
+<h3 id="file-path-normalization">File path normalization</h3>
+<p>Path handling has to deal with drive letters, mixed <code>/</code> and <code>\</code>, and collapsing <code>.</code> and <code>..</code>. Separators are matched with a predicate rather than a string, because <code>accept(&quot;/\\&quot;)</code> would look for the literal two-character sequence <code>/\</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>bx<span style="color:#f92672">::</span>Scanner scanner(src);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#66d9ef">if</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">&lt;=</span> src.getLength()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#f92672">&amp;&amp;</span>  <span style="color:#e6db74">&#39;:&#39;</span> <span style="color:#f92672">==</span> src.getPtr()[<span style="color:#ae81ff">1</span>])       <span style="color:#75715e">// Windows drive letter.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span><span style="color:#75715e"></span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>    size <span style="color:#f92672">+=</span> write(<span style="color:#f92672">&amp;</span>writer, toUpper(src.getPtr()[<span style="color:#ae81ff">0</span>]), <span style="color:#f92672">&amp;</span>err);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    size <span style="color:#f92672">+=</span> write(<span style="color:#f92672">&amp;</span>writer, <span style="color:#e6db74">&#39;:&#39;</span>, <span style="color:#f92672">&amp;</span>err);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>    scanner.seek(<span style="color:#ae81ff">2</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">bool</span> rooted <span style="color:#f92672">=</span> <span style="color:#f92672">!</span>scanner.accept(isPathSeparator).isEmpty();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span><span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>scanner.isDone()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span><span style="color:#f92672">&amp;&amp;</span>     err.isOk() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>scanner.acceptWhile(isPathSeparator).isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>        trailingSlash <span style="color:#f92672">=</span> scanner.isDone();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>        <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>    <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView component <span style="color:#f92672">=</span> scanner.acceptWhile(isNotPathSeparator);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>    <span style="color:#75715e">// `.` is skipped, `..` rewinds the writer to the previous separator.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>The <code>..</code> handling rewinds the output rather than the input, with a watermark marking the prefix that <code>..</code> is not allowed to escape. The scanner&rsquo;s job is only to hand over one component at a time, which is exactly the part that used to be fiddly.</p>
+<h3 id="stack-trace-symbolication">Stack trace symbolication</h3>
+<p>Turning a line of <code>atos</code> or <code>addr2line</code> output into a function name plus file and line replaces a cluster of <code>strstr</code> calls and pointer arithmetic:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">for</span> (bx<span style="color:#f92672">::</span>LineReader lr({atosBuffer, bytes}); <span style="color:#f92672">!</span>lr.isDone(); )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>    bx<span style="color:#f92672">::</span>Scanner scanner(lr.next() );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>    functionName <span style="color:#f92672">=</span> scanner.acceptUntil(<span style="color:#e6db74">&#34; (&#34;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    <span style="color:#66d9ef">if</span> (functionName.isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>    scanner.accept(<span style="color:#e6db74">&#34; (&#34;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>    filePath <span style="color:#f92672">=</span> scanner.acceptUntil(<span style="color:#e6db74">&#34;:&#34;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>    <span style="color:#66d9ef">if</span> (filePath.isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>        filePath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;Unknown?&gt;&#34;</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>    scanner.accept(<span style="color:#e6db74">&#39;:&#39;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>    <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView lineStr <span style="color:#f92672">=</span> scanner.acceptUntil(<span style="color:#e6db74">&#34;)&#34;</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>lineStr.isEmpty() )
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span>    {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span>        bx<span style="color:#f92672">::</span>fromString(<span style="color:#f92672">&amp;</span>line, lineStr);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span>    }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span>}
+</span></span></code></pre></div><p>This is the collapse from the previous section working in your favour. An empty function name is not a valid result, so &ldquo;missing&rdquo; and &ldquo;empty&rdquo; being indistinguishable is exactly what you want, and the plain return value is the only test needed.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>I first needed this the last time I was writing yet another ad-hoc parser, this time for <code>addr2line</code> output. That produced (now deleted) <a href="https://github.com/bkaradzic/bx/blob/cd6720ce9a4555a083dd342925b29837149b1629/src/debug.cpp#L950-L964"><code>strConsumeTo</code></a>, which later became the core of <code>bx::Scanner</code>.</p>
+<p>By using <code>bx::Scanner</code> I managed to delete: an INI library dependency, and three hand-rolled copies of the same whitespace-and-identifier loop, in URL parsing, path normalization, and stack trace symbolication.</p>
+<p>If you find yourself writing yet another pointer-chasing loop to skip whitespace and collect an identifier, consider reaching for something like this instead. Parsers really don’t have to be complicated.</p>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

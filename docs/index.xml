@@ -6,7 +6,19 @@
     <description>Recent content in Home on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 03 May 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Parsers don’t have to be complicated</title>
+      <link>https://bkaradzic.github.io/posts/scanner/</link>
+      <pubDate>Mon, 27 Jul 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/scanner/</guid>
+      
+      <description>Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
+It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</description>
+      
+    </item>
+    
     <item>
       <title>Making cross-platform SIMD code pleasant</title>
       <link>https://bkaradzic.github.io/posts/typeless-simd/</link>
