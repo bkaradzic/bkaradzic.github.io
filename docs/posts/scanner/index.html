@@ -72,8 +72,7 @@
 
     
     <meta property="og:title" content="Parsers don’t have to be complicated" />
-<meta property="og:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
-It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it." />
+<meta property="og:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator. It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bkaradzic.github.io/posts/scanner/" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2026-07-27T00:00:00+00:00" />
@@ -83,8 +82,7 @@ It was small, it worked, but I never liked the code it produced. The generated o
 
     
     <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Parsers don’t have to be complicated"/>
-<meta name="twitter:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
-It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it."/>
+<meta name="twitter:description" content="Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator. It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it."/>
 
 
     
@@ -225,8 +223,7 @@ stroke-linejoin="round" class="feather feather-home">
     </details>
             <div class="page-content">
                 <h2 id="introduction">Introduction</h2>
-<p>Years ago I started writing a proper shader front-end parser for bgfx and used the <a href="https://sqlite.org/lemon.html">Lemon parser generator</a>.</p>
-<p>It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</p>
+<p>Years ago I started writing a proper shader front-end parser for bgfx and used the <a href="https://sqlite.org/lemon.html">Lemon parser generator</a>. It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</p>
 <p>On the other side of the spectrum I kept writing ad-hoc parsers for smaller things where using something like Lemon was overkill. Pointer arithmetic, manual loops over characters, a handful of <code>strchr/strncmp</code> style calls, some state variables, and a hope that I hadn’t missed an edge case. These were fast and had no dependencies, but they always ended up repeating the same patterns: skipping whitespace, collecting identifiers, tracking line numbers for error messages, handling the inevitable off-by-one when the input wasn’t perfectly formed. Each new parser became its own little minefield of one-off bugs, and every new thing that needed parsing got its own private copy of them.</p>
 <p>Most of this ad-hoc parsing code looked roughly like this:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> pos <span style="color:#f92672">=</span> input.getPtr();

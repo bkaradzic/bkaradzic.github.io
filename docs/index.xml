@@ -14,8 +14,7 @@
       
       <guid>https://bkaradzic.github.io/posts/scanner/</guid>
       
-      <description>Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator.
-It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</description>
+      <description>Introduction Years ago I started writing a proper shader front-end parser for bgfx and used the Lemon parser generator. It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.</description>
       
     </item>
     

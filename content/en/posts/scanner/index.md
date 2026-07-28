@@ -6,9 +6,7 @@ toc: true
 
 ## Introduction
 
-Years ago I started writing a proper shader front-end parser for bgfx and used the [Lemon parser generator](https://sqlite.org/lemon.html).
-
-It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.
+Years ago I started writing a proper shader front-end parser for bgfx and used the [Lemon parser generator](https://sqlite.org/lemon.html). It was small, it worked, but I never liked the code it produced. The generated output felt hard to read, and the code that generated the parser also felt alien to me. Every time the grammar changed I had to re-learn the shape of the resulting code. It solved the problem, but eventually I abandoned it.
 
 On the other side of the spectrum I kept writing ad-hoc parsers for smaller things where using something like Lemon was overkill. Pointer arithmetic, manual loops over characters, a handful of `strchr/strncmp` style calls, some state variables, and a hope that I hadn’t missed an edge case. These were fast and had no dependencies, but they always ended up repeating the same patterns: skipping whitespace, collecting identifiers, tracking line numbers for error messages, handling the inevitable off-by-one when the input wasn’t perfectly formed. Each new parser became its own little minefield of one-off bugs, and every new thing that needed parsing got its own private copy of them.
 
