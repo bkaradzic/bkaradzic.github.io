@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Writing a C preprocessor for bgfx shader compiler | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Writing a C preprocessor for bgfx shader compiler | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Writing a C preprocessor for bgfx shader compiler | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Writing a C preprocessor for bgfx shader compiler | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Writing a C preprocessor for bgfx shader compiler | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/preprocessor/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-08-20T00:00:00Z />
+    <meta property="article:published_time" content=2026-08-20T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/preprocessor/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Writing a C preprocessor for bgfx shader compiler",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-08-20",
+        "description": "",
+        "wordCount":  2583 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-08-20",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Writing a C preprocessor for bgfx shader compiler" />
+<meta property="og:description" content="Introduction For 14&#43; years, every shader that bgfx compiled, starting from the initial commit, went through a preprocessor written for the Amiga with origins in 1984:
+fcpp - Frexx CPP (C Preprocessor)
+This is a C preprocessor. It is a project based on public domain code, then forked by Daniel in 1993 and future work has been done under a BSD license.
+That public domain code is the DECUS cpp, written by Martin Minow in 1984–85." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/preprocessor/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-08-20T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-08-20T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Writing a C preprocessor for bgfx shader compiler"/>
+<meta name="twitter:description" content="Introduction For 14&#43; years, every shader that bgfx compiled, starting from the initial commit, went through a preprocessor written for the Amiga with origins in 1984:
+fcpp - Frexx CPP (C Preprocessor)
+This is a C preprocessor. It is a project based on public domain code, then forked by Daniel in 1993 and future work has been done under a BSD license.
+That public domain code is the DECUS cpp, written by Martin Minow in 1984–85."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/preprocessor/">
+    <link href="/style.min.6e36f9b3ef88664a08bdd73c5d56a2e1f35a6c54a7c6e08b921f46364caa181f.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Writing a C preprocessor for bgfx shader compiler</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-08-20T00:00:00&#43;00:00" itemprop="datePublished"> Aug 20, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#so-whats-bad-about-it">So what&rsquo;s bad about it?</a></li>
+    <li><a href="#why-bgfx-shader-compiler-needs-preprocessor">Why bgfx shader compiler needs preprocessor?</a></li>
+    <li><a href="#what-else-is-out-there">What else is out there?</a></li>
+    <li><a href="#writing-c-preprocessor-from-scratch">Writing C preprocessor from scratch</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>For 14+ years, every shader that bgfx compiled, starting from the <a href="https://github.com/bkaradzic/bgfx/tree/dee3fe5266e9e17a4783df797333b86677e7e2c7">initial commit</a>, went through a preprocessor written for the Amiga with origins in 1984:</p>
+<p><a href="https://github.com/bagder/fcpp">fcpp - Frexx CPP (C Preprocessor)</a></p>
+<blockquote>
+<p>This is a C preprocessor. It is a project based on public domain code, then forked by Daniel in
+1993 and future work has been done under a BSD license.</p>
+</blockquote>
+<p>That public domain code is the <a href="https://github.com/xianpinder/DecusCPP">DECUS cpp</a>, written by Martin Minow in 1984–85. So the preprocessor bgfx shipped in 2026 had a code lineage reaching back forty years, by way of an Amiga port. The sources still carry <code>REG(a0)</code> register-parameter macros and <code>#ifdef AMIGA</code> blocks.</p>
+<p><strong>And it worked.</strong> This deserves emphasis, because the rest of this post is about replacing it. Over fourteen years fcpp needed only 25 commits&rsquo; worth of attention in the bgfx tree, most of them routine resyncs with upstream. For a dependency you are supposed to forget about, that is close to the ideal outcome.</p>
+<p>What made it a good fit specifically was how <strong>configurable</strong> it was. fcpp exposes 37 <code>FPPTAG_*</code> options through a single entry point:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">fppPreProcess</span>(<span style="color:#66d9ef">struct</span> fppTag <span style="color:#f92672">*</span>tags);
+</span></span></code></pre></div><p><code>shaderc</code> used 13 of them: <code>FPPTAG_INPUT</code> and <code>FPPTAG_OUTPUT</code> to route all I/O through bgfx&rsquo;s own file abstraction, <code>FPPTAG_ERROR</code> to capture diagnostics, <code>FPPTAG_DEPENDS</code> for makefile dependency output, plus <code>FPPTAG_LINE</code>, <code>FPPTAG_KEEPCOMMENTS</code>, <code>FPPTAG_RIGHTCONCAT</code> and others to shape the output. Crucially, fcpp keeps <strong>no global mutable state</strong>, everything lives in a <code>struct Global</code> allocated per call, and it never insists on calling <code>fopen</code> itself. Both properties are rarer than they should be, and both are exactly what an embedder wants. <strong>fcpp got the architecture right.</strong></p>
+<h2 id="so-whats-bad-about-it">So what&rsquo;s bad about it?</h2>
+<p><strong>The code is crufty.</strong> It is K&amp;R-flavoured C89 with 1980s conventions throughout, spread over six <code>.c</code> files with names that tell you nothing: <code>cpp1.c</code> through <code>cpp6.c</code>. State is threaded through a 250-line <code>struct Global</code>. Making a behavioural change means understanding a program written under constraints 512 KB of RAM, no function prototypes, that stopped applying decades ago.</p>
+<p><strong>Upstream is frozen.</strong> fcpp is not <strong>abandoned</strong>; Daniel Stenberg still merges the occasional PR. But the most recent one, in November 2025, is titled <em>&ldquo;tidy-up whitespace, fix warnings, potential overflow&rdquo;</em>. It is janitorial. There has been no functional development in many years. One detail captures the situation precisely. That November 2025 upstream commit fixes an <code>sprintf</code> buffer overflow in <code>cpp3.c</code>:</p>
+<pre tabindex="0"><code>cpp3.c:336:28: warning: &#39;%4d&#39; directive writing between 4 and 11 bytes into
+a region of size between 0 and 6 [-Wformat-overflow=]
+</code></pre><p>bgfx had already fixed that exact bug locally in commit <a href="https://github.com/bkaradzic/bgfx/commit/ab0a09118e79f5da0a59731c9d8d21261cd3a758"><code>ab0a091</code>, on 8 December 2018</a>, <strong>seven years earlier</strong>. That is what a frozen dependency feels like from the outside: you carry local patches indefinitely, and upstream converges on your fix long after you forgot about it.</p>
+<h2 id="why-bgfx-shader-compiler-needs-preprocessor">Why bgfx shader compiler needs preprocessor?</h2>
+<p>It is worth being clear about what that preprocessor is actually doing there, because it is not typical role that C preprocessor usually plays in C/C++ code. bgfx targets a dozen graphics APIs, and each comes with its own shading language: HLSL for Direct3D, Metal Shading Language on Apple platforms, GLSL and its embedded variant for OpenGL, SPIR-V for Vulkan, WGSL for WebGPU. They are close relatives, but they disagree constantly on details, how you declare a texture and its sampler, how you bind one to a register, how you multiply a matrix, what an entry point looks like. Rather than ask people to write and maintain one shader per API, bgfx has them write one bgfx&rsquo;s GLSL-inspired style, then include a header at the top of it: <code>bgfx_shader.sh</code> for vertex and fragment shaders, <code>bgfx_compute.sh</code> for compute. Those headers are almost nothing <strong>but</strong> preprocessor, a few hundred macros and conditional branches that reshape that single source into whatever the target language expects, selected by defines the compiler sets per target. So the preprocessor is not a preliminary pass that strips comments before the real work begins, it <strong>is</strong> the portability layer, and every shader in every bgfx project goes through it.</p>
+<h2 id="what-else-is-out-there">What else is out there?</h2>
+<p>I looked at what else was out there to find a comparable replacement.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>fcpp</strong></th>
+<th><strong>ucpp</strong></th>
+<th><strong>mcpp</strong></th>
+<th><strong>tinycpp</strong></th>
+<th><strong>tcpp</strong></th>
+<th><strong>Desired</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language</td>
+<td>C89</td>
+<td>C89/C99</td>
+<td>C89</td>
+<td>C99 + POSIX</td>
+<td>C++14</td>
+<td><strong>C99 or C++20 (or below)</strong></td>
+</tr>
+<tr>
+<td>Core size</td>
+<td>5,737 LOC</td>
+<td>10,725 LOC</td>
+<td>17,489 LOC</td>
+<td>2,032 + 624 LOC</td>
+<td>2,331 LOC</td>
+<td><strong>~2-3K LOC max</strong></td>
+</tr>
+<tr>
+<td>Files</td>
+<td>6 <code>.c</code> + 7 <code>.h</code></td>
+<td>8 <code>.c</code> + 7 <code>.h</code></td>
+<td>7 <code>.c</code> + 5 <code>.h</code></td>
+<td>2 <code>.c</code> + 2 <code>.h</code> + 4 <code>.h</code></td>
+<td>1 <code>.hpp</code></td>
+<td><strong>1 <code>.cpp</code> + 1 <code>.h</code></strong></td>
+</tr>
+<tr>
+<td>Licence</td>
+<td>BSD-3 / MIT</td>
+<td>BSD-3</td>
+<td>BSD-2</td>
+<td>MIT <em>(+ LGPL dep)</em></td>
+<td>Apache-2.0</td>
+<td><strong>Permissive</strong></td>
+</tr>
+<tr>
+<td>Last commit</td>
+<td>2025-11 (janitorial)</td>
+<td>2015 (archived)</td>
+<td>2017</td>
+<td>2020</td>
+<td>2025-04</td>
+<td><strong>active</strong></td>
+</tr>
+<tr>
+<td>Third-party deps</td>
+<td>none</td>
+<td>none</td>
+<td>none</td>
+<td>libulz (LGPL-2.1)</td>
+<td>none</td>
+<td><strong>none</strong></td>
+</tr>
+<tr>
+<td>C++ STL</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>heavy</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>Custom allocator</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td>Global mutable state</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+<td>no</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>Virtual filesystem</td>
+<td>partial</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td>Structured error callback</td>
+<td>yes</td>
+<td>opt-in</td>
+<td>text only</td>
+<td>no / stderr</td>
+<td>yes</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td>Calls <code>exit()</code></td>
+<td>no</td>
+<td>yes</td>
+<td>likely</td>
+<td>no</td>
+<td>no</td>
+<td><strong>no</strong></td>
+</tr>
+<tr>
+<td>Variadic macros</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+<td><strong>yes</strong></td>
+</tr>
+<tr>
+<td>Trigraphs / digraphs</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+<td>no</td>
+<td><strong>Don&rsquo;t care!</strong></td>
+</tr>
+</tbody>
+</table>
+</br>
+A few notes on each.
+<p><strong><a href="https://github.com/lpsantil/ucpp">ucpp</a></strong> is the most standards-serious of the small ones, genuinely, fully C99, with trigraphs, digraphs, <code>_Pragma</code> and arbitrary-precision <code>#if</code> arithmetic. It is also the largest of them after mcpp: at 10,725 lines it is nearly twice fcpp and four times tinycpp, which is the price of that conformance. It is <strong>archived on GitHub</strong>, with its last commit in March 2015. It keeps preprocessor state in file-scope globals. That rules out two instances at once, which rules out ever compiling shaders on a thread pool. It also resolves <code>#include</code> by calling <code>fopen</code> itself, and its fatal path is <code>die()</code> → <code>exit(1)</code>.</p>
+<p><strong><a href="https://github.com/ned14/mcpp">mcpp</a></strong> is the conformance champion, and is honest about it, the README claims <em>&ldquo;the highest conformance&rdquo;</em> and it ships a validation suite so respected that tinycpp&rsquo;s author used it to test his own implementation. It is also 17,489 lines with an autoconf build, module-level global state, a <code>mcpp_lib_main(int argc, char **argv)</code> entry point that wants <em>command-line arguments</em>, and no way to intercept include resolution. It is a compiler component that grew a library mode, not a library. <strong>Last commit: 2017.</strong></p>
+<p><strong><a href="https://github.com/rofl0r/tinycpp">tinycpp</a></strong> is the closest in spirit to what I wanted. The smallest real implementation in the survey at 2,032 lines, MIT, with a clean opaque-handle API and no globals. Three things stopped us, and the first is fatal on its own. tinycpp is MIT, but it is not self-contained: it needs <code>tglist.h</code> and <code>hbmap.h</code> from <a href="https://github.com/rofl0r/libulz">libulz</a> which is <strong>LGPL-2.1</strong>! Then its I/O is <code>FILE*</code>-shaped, and diagnostics go straight to <code>stderr</code> with no callback.</p>
+<p><strong><a href="https://github.com/bnoazx005/tcpp">tcpp</a></strong> is aimed squarely at shader preprocessing, which makes it the most obvious candidate on paper, and it has the nicest embedding story of the lot: an <code>IInputStream</code> interface and a <code>std::function</code> include callback, so it never touches the filesystem. But it is a single 2,331-line header that includes <code>&lt;string&gt;</code>, <code>&lt;vector&gt;</code>, <code>&lt;list&gt;</code>, <code>&lt;unordered_map&gt;</code>, <code>&lt;unordered_set&gt;</code>, <code>&lt;sstream&gt;</code>, <code>&lt;functional&gt;</code>, <code>&lt;memory&gt;</code>, <code>&lt;algorithm&gt;</code>, <code>&lt;tuple&gt;</code> and <code>&lt;stack&gt;</code>. 🤮 <strong>Nope!</strong></p>
+<p>The pattern across all five: the ones with clean embedding stories are STL-heavy or unmaintained, the ones with real conformance are large and full of globals, the one that is small and well-designed drags in an LGPL dependency, and <strong>none</strong> of them let you supply an allocator.</p>
+<h2 id="writing-c-preprocessor-from-scratch">Writing C preprocessor from scratch</h2>
+<p><code>shaderc::Preprocessor</code> is around 3K lines of code across <code>pp.cpp</code> and <code>pp.h</code>. The public surface is deliberately tiny - its entire public surface is one callback interface and one class:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  1</span><span><span style="color:#66d9ef">namespace</span> shaderc
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  2</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  3</span><span>	<span style="color:#75715e">/// Position in the source being preprocessed.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  4</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  5</span><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">SourceLocation</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  6</span><span>	{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  7</span><span>		<span style="color:#75715e">/// Default constructor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  8</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">  9</span><span><span style="color:#75715e"></span>		SourceLocation()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 10</span><span>			<span style="color:#f92672">:</span> line(<span style="color:#ae81ff">0</span>) {}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 11</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 12</span><span>		<span style="color:#75715e">/// Constructor with specific file, and line number.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 13</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 14</span><span><span style="color:#75715e"></span>		SourceLocation(<span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _file, <span style="color:#66d9ef">uint32_t</span> _line)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 15</span><span>			<span style="color:#f92672">:</span> file(_file), line(_line) {}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 16</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 17</span><span>		bx<span style="color:#f92672">::</span>StringView file; <span style="color:#75715e">//!&lt; File the location is in.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 18</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">uint32_t</span>       line; <span style="color:#75715e">//!&lt; One-based line number inside `file`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 19</span><span><span style="color:#75715e"></span>	};
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 20</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 21</span><span>	<span style="color:#75715e">/// Host hooks for the preprocessor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 22</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 23</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// All file IO and diagnostics are routed through these so the engine itself never touches
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 24</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// the filesystem and stays reentrant. One `Preprocessor` instance is one independent unit
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 25</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// of work.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 26</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 27</span><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">BX_NO_VTABLE</span> PreprocessorCallbackI
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 28</span><span>	{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 29</span><span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 30</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">virtual</span> <span style="color:#f92672">~</span>PreprocessorCallbackI() <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 31</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 32</span><span>		<span style="color:#75715e">/// Resolve and read `#include`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 33</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 34</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in]  _name Include name, without quotes or angle brackets.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 35</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in]  _isSystem True for `&lt;...&gt;`, and false for `&#34;...&#34;`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 36</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in]  _from File holding the directive, so that quoted include can be resolved
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 37</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///   relative to it.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 38</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[out] _writer File text is written here. Preprocessor owns the storage, and
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 39</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///   copies it out before this call returns, so nothing has to outlive the call.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 40</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[out] _outPath Resolved path, used for dependency reporting.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 41</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[out] _err Error, set if writing file text fails.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 42</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 43</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @returns True if include is resolved and read, otherwise returns false.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 44</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 45</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">include</span>(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 46</span><span>			  <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _name
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 47</span><span>			, <span style="color:#66d9ef">bool</span> _isSystem
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 48</span><span>			, <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _from
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 49</span><span>			, bx<span style="color:#f92672">::</span>WriterI<span style="color:#f92672">*</span> _writer
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 50</span><span>			, bx<span style="color:#f92672">::</span>FilePath<span style="color:#f92672">&amp;</span> _outPath
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 51</span><span>			, bx<span style="color:#f92672">::</span>Error<span style="color:#f92672">*</span> _err
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 52</span><span>			) <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 53</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 54</span><span>		<span style="color:#75715e">/// Reports file the output depends on. It&#39;s called for the main source, and for every
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 55</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// opened include.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 56</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 57</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _path Resolved path of the file.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 58</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 59</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @remarks Default implementation ignores dependencies.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 60</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 61</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">depend</span>(<span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _path) <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 62</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 63</span><span>		<span style="color:#75715e">/// Diagnostic sink.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 64</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 65</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _isError True for `#error` and hard failures, and false for `#warning`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 66</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _location Source position the diagnostic originated from.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 67</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _message Diagnostic message.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 68</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 69</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">virtual</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">message</span>(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 70</span><span>			  <span style="color:#66d9ef">bool</span> _isError
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 71</span><span>			, <span style="color:#66d9ef">const</span> SourceLocation<span style="color:#f92672">&amp;</span> _location
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 72</span><span>			, <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _message
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 73</span><span>			) <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 74</span><span>	};
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 75</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 76</span><span>	<span style="color:#66d9ef">inline</span> PreprocessorCallbackI<span style="color:#f92672">::~</span>PreprocessorCallbackI()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 77</span><span>	{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 78</span><span>	}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 79</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 80</span><span>	<span style="color:#75715e">/// C-style preprocessor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 81</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 82</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// Supports object and function macros (including variadics and `__VA_OPT__`), `#` and `##`,
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 83</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// `#if`, `#ifdef`, `#ifndef`, `#elif`, `#elifdef`, `#elifndef`, `#else`, `#endif`,
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 84</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// `#include`, `#line`, `#pragma once`, `#error`, `#warning`, and `__LINE__`, `__FILE__` and
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 85</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">/// `__COUNTER__`. There are no trigraphs or digraphs.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 86</span><span><span style="color:#75715e"></span>	<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 87</span><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Preprocessor</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 88</span><span>	{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 89</span><span>		BX_CLASS(Preprocessor
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 90</span><span>			, NO_COPY
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 91</span><span>			);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 92</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 93</span><span>	<span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 94</span><span>		<span style="color:#75715e">/// Constructor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 95</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 96</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _callback Host hooks. It must outlive Preprocessor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 97</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _allocator Allocator. It must not be NULL, and it must outlive
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 98</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///   Preprocessor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 99</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">100</span><span><span style="color:#75715e"></span>		Preprocessor(PreprocessorCallbackI<span style="color:#f92672">&amp;</span> _callback, bx<span style="color:#f92672">::</span>AllocatorI<span style="color:#f92672">*</span> _allocator);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">101</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">102</span><span>		<span style="color:#75715e">/// Destructor.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">103</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">104</span><span><span style="color:#75715e"></span>		<span style="color:#f92672">~</span>Preprocessor();
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">105</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">106</span><span>		<span style="color:#75715e">/// Predefine macro, mirroring `-D` command-line define.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">107</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">108</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _define Macro in `NAME`, `NAME=VALUE`, or `NAME(a,b)=body` form.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">109</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">110</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">define</span>(<span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _define);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">111</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">112</span><span>		<span style="color:#75715e">/// Remove predefined, or previously defined macro.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">113</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">114</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _name Macro name.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">115</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">116</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">undefine</span>(<span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _name);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">117</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">118</span><span>		<span style="color:#75715e">/// Emit `#line &lt;line&gt; &#34;&lt;file&gt;&#34;` directives into the output so that consumer can map the
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">119</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// result back to the original source.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">120</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">121</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in] _emit True to emit `#line` directives.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">122</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">123</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @remarks It&#39;s off by default. Directives, skipped `#if` branches, and `#include` all
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">124</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///   break 1:1 line mapping, so this is the only way to get meaningful positions, but it
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">125</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///   requires consumer to understand `#line`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">126</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">127</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setEmitLineDirectives</span>(<span style="color:#66d9ef">bool</span> _emit);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">128</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">129</span><span>		<span style="color:#75715e">/// Preprocess source.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">130</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">131</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in]  _name Source name, used for diagnostics and `__FILE__`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">132</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[in]  _source Source to preprocess.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">133</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[out] _writer Result is written here.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">134</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @param[out] _err Error, set if writing result fails.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">135</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">136</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">/// @returns True on success, or false if `#error`, or hard error was reported.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">137</span><span><span style="color:#75715e"></span>		<span style="color:#75715e">///
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">138</span><span><span style="color:#75715e"></span>		<span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">preprocess</span>(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">139</span><span>			  <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _name
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">140</span><span>			, <span style="color:#66d9ef">const</span> bx<span style="color:#f92672">::</span>StringView<span style="color:#f92672">&amp;</span> _source
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">141</span><span>			, bx<span style="color:#f92672">::</span>WriterI<span style="color:#f92672">*</span> _writer
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">142</span><span>			, bx<span style="color:#f92672">::</span>Error<span style="color:#f92672">*</span> _err
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">143</span><span>			);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">144</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">145</span><span>	<span style="color:#66d9ef">private</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">146</span><span>		<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">PreprocessorImpl</span><span style="color:#f92672">*</span> m_impl;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">147</span><span>	};
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">148</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">149</span><span>} <span style="color:#75715e">// namespace shaderc
+</span></span></span></code></pre></div><p>That is the whole API. Compare it to fcpp&rsquo;s 37 tags, of which we used 13 and ignored 24.</p>
+<p>It supports <code>#define</code>, <code>#undef</code>, <code>#if</code>, <code>#ifdef</code>, <code>#ifndef</code>, <code>#elif</code>, <code>#else</code>, <code>#endif</code>, <code>#include</code>, <code>#pragma</code>, <code>#error</code>, <code>#warning</code> and <code>#line</code>; object and function macros including variadics; <code>#</code> and <code>##</code>; and <code>__LINE__</code> and <code>__FILE__</code>.</p>
+<p><strong>1. We do not care about full C99 conformance.</strong> Trigraphs and digraphs exist so that 1980s terminals lacking <code>#</code>, <code>[</code> and <code>{</code> could write C. No shader has ever needed <code>??=define</code>. <code>_Pragma</code>, <code>#include_next</code>, universal character names in identifiers and multi-byte identifier support are all similarly irrelevant to GLSL and HLSL. Every one of those features is code that must be written, tested, and read by the next person. ucpp and mcpp are <strong>correct</strong> to implement them, they are targeting C compilers. We are targeting shaders, and the honest scope is much smaller.</p>
+<p><strong>2. But we are conformant where it actually matters.</strong> The two hardest parts of a C preprocessor are recursive macro expansion and <code>##</code>. And both are supported. This is not a hypothetical requirement: bgfx&rsquo;s own shader headers lean hard on both, and getting either subtly wrong produces a shader that still compiles and quietly does the wrong thing.</p>
+<p><strong>3. The allocator is injectable, and nothing else allocates.</strong> <code>Preprocessor</code> takes an <code>AllocatorI*</code>. Internally everything lands in an arena that bump-allocates 16-byte-aligned blocks and frees them all at once. Tokens, macro bodies and interned strings are arena-allocated and never individually freed, because a preprocessor run is a phase with a natural end. <strong>None of the five alternatives offers this.</strong> All four C implementations hard-code <code>malloc</code>/<code>free</code>; tcpp hard-codes the C++ default allocator. For a codebase whose whole premise is that you control your own memory, that is disqualifying on its own.</p>
+<p><strong>4. No third-party dependencies.</strong> <code>pp.cpp</code> includes only bx headers:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;bx/allocator.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;bx/filepath.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;bx/scanner.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;bx/sort.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;tinystl/vector.h&gt;</span><span style="color:#75715e">
+</span></span></span></code></pre></div><p><strong>5. The lexer is <code>bx::Scanner</code>, not ad-hoc character scanning.</strong> bx already had a <a href="/posts/scanner/">scanner</a> with <code>accept</code>, <code>acceptWhile</code> and character-class handling, and it does line counting for us. Every preprocessor in the comparison hand-rolls this, and hand-rolled lexers are where off-by-one and line-number bugs live. Reusing the scanner is the single biggest reason the implementation is 3,000 lines instead of 5,000.</p>
+<p><strong>6. It is reentrant by construction.</strong> No globals, no statics, no <code>errno</code>-style side channels, and one <code>Preprocessor</code> is one independent unit of work. Nothing prevents compiling shaders in parallel. ucpp and mcpp cannot make this claim.</p>
+<p><strong>7. It never touches the filesystem and it never exits.</strong> Every read goes through <code>PpCallbackI::include</code>, so <code>shaderc</code> resolves includes with its own search-path logic and could just as easily serve them from memory or an archive. Diagnostics go to <code>message()</code> with file, line and severity as <em>structured data</em>, not a formatted string on <code>stderr</code>. Failures return <code>false</code> and set a <code>bx::Error</code>. There is no path that calls <code>exit()</code> or <code>abort()</code> on the host.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>A preprocessor is not something I had longed to rewrite. I wanted to replace it eventually with something better-maintained, but the projects I had bookmarked for a while turned out to be worse than fcpp for the things that matter to me. Recently, after <a href="https://github.com/bkaradzic/bgfx/commit/c2fb64201b75b6af7ddae9a3e6409a8fc0e46343">fixing an issue</a>, I got the itch to challenge my <a href="/posts/scanner/"><code>bx::Scanner</code></a> idea by writing something more complicated than an .ini-file parser.</p>
+<p>You can check new C preprocessor code in bgfx repo <a href="https://github.com/bkaradzic/bgfx/blob/8c283532679dda82de7454fe7af382b36299897a/tools/shaderc/pp.cpp#L6">here</a>.</p>
+<p>fcpp was removed in commit <a href="https://github.com/bkaradzic/bgfx/commit/8c283532679dda82de7454fe7af382b36299897a"><code>8c28353</code></a>, 20 August 2026, after 14 years and 4 months of service. Thanks, fcpp!</p>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <a href="https://github.com/sponsors/bkaradzic">sponsor</a>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

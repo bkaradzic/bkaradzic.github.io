@@ -6,7 +6,21 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 27 Jul 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 20 Aug 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Writing a C preprocessor for bgfx shader compiler</title>
+      <link>https://bkaradzic.github.io/posts/preprocessor/</link>
+      <pubDate>Thu, 20 Aug 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/preprocessor/</guid>
+      
+      <description>Introduction For 14+ years, every shader that bgfx compiled, starting from the initial commit, went through a preprocessor written for the Amiga with origins in 1984:
+fcpp - Frexx CPP (C Preprocessor)
+This is a C preprocessor. It is a project based on public domain code, then forked by Daniel in 1993 and future work has been done under a BSD license.
+That public domain code is the DECUS cpp, written by Martin Minow in 1984–85.</description>
+      
+    </item>
+    
     <item>
       <title>Parsers don’t have to be complicated</title>
       <link>https://bkaradzic.github.io/posts/scanner/</link>
