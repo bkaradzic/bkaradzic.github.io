@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">The bgfx shader compiler, 14 years of not being a compiler | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="The bgfx shader compiler, 14 years of not being a compiler | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="The bgfx shader compiler, 14 years of not being a compiler | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="The bgfx shader compiler, 14 years of not being a compiler | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="The bgfx shader compiler, 14 years of not being a compiler | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/shaderc-overview/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-09-27T00:00:00Z />
+    <meta property="article:published_time" content=2026-09-27T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/shaderc-overview/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "The bgfx shader compiler, 14 years of not being a compiler",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-09-27",
+        "description": "",
+        "wordCount":  3904 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-09-27",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="The bgfx shader compiler, 14 years of not being a compiler" />
+<meta property="og:description" content="Introduction bgfx renders through many backends, and each of them wants shaders in its own language: HLSL for Direct3D, Metal Shading Language on Apple platforms, GLSL for OpenGL and ESSL for OpenGL ES, SPIR-V for Vulkan, WGSL for WebGPU, etc. Nobody wants to write and maintain one shader per API. So bgfx has a shader compiler, shaderc, that takes a single source written in bgfx&rsquo;s GLSL-flavoured dialect and produces a binary blob for whichever backend you ask for." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/shaderc-overview/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-09-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-09-27T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="The bgfx shader compiler, 14 years of not being a compiler"/>
+<meta name="twitter:description" content="Introduction bgfx renders through many backends, and each of them wants shaders in its own language: HLSL for Direct3D, Metal Shading Language on Apple platforms, GLSL for OpenGL and ESSL for OpenGL ES, SPIR-V for Vulkan, WGSL for WebGPU, etc. Nobody wants to write and maintain one shader per API. So bgfx has a shader compiler, shaderc, that takes a single source written in bgfx&rsquo;s GLSL-flavoured dialect and produces a binary blob for whichever backend you ask for."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/shaderc-overview/">
+    <link href="/style.min.6e36f9b3ef88664a08bdd73c5d56a2e1f35a6c54a7c6e08b921f46364caa181f.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">The bgfx shader compiler, 14 years of not being a compiler</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-09-27T00:00:00&#43;00:00" itemprop="datePublished"> Sep 27, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#how-does-it-work">How does it work?</a></li>
+    <li><a href="#before-and-after-glsl-optimizer">Before and after glsl-optimizer</a>
+      <ul>
+        <li><a href="#could-it-be-simpler">Could it be simpler?</a></li>
+      </ul>
+    </li>
+    <li><a href="#glsl-optimizer-was-a-great-idea">glsl-optimizer was a great idea!</a></li>
+    <li><a href="#what-makes-shaderc-janky">What makes shaderc janky?</a></li>
+    <li><a href="#how-do-others-do-it">How do others do it?</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>bgfx renders through many backends, and each of them wants shaders in its own language: HLSL for Direct3D, Metal Shading Language on Apple platforms, GLSL for OpenGL and ESSL for OpenGL ES, SPIR-V for Vulkan, WGSL for WebGPU, etc. Nobody wants to write and maintain one shader per API. So bgfx has a shader compiler, <code>shaderc</code>, that takes a single source written in bgfx&rsquo;s GLSL-flavoured dialect and produces a binary blob for whichever backend you ask for.</p>
+<p><code>shaderc</code> is the <strong>jankiest</strong> part of bgfx. I&rsquo;ll say that upfront, because the rest of this post explains why it is janky, why it still works after fourteen years, and why I haven&rsquo;t replaced it. It is not a compiler in the textbook sense. There is no parser, no AST, no IR of its own. It is a C preprocessor, a pile of <code>#define</code>s, textual patching of the source, and then a hand-off to somebody else&rsquo;s real compiler. The price is that every target reports errors in its own way. The benefit is that adding a new target has never required touching a front-end, because there isn&rsquo;t one. The language you write is GLSL. For every target that is not OpenGL, the text that actually gets compiled is HLSL.</p>
+<p><code>shaderc</code> was in the <a href="https://github.com/bkaradzic/bgfx/tree/dee3fe5266e9e17a4783df797333b86677e7e2c7">initial commit</a> of bgfx, on 3 April 2012, as a single <a href="https://github.com/bkaradzic/bgfx/blob/dee3fe5266e9e17a4783df797333b86677e7e2c7/tools/shaderc.cpp"><code>tools/shaderc.cpp</code></a> of 664 lines. It came with two third-party dependencies, both of which outlived every other decision made that day: fcpp, a C preprocessor with <a href="/posts/preprocessor/">roots in 1984</a>, and <a href="https://github.com/aras-p/glsl-optimizer">glsl-optimizer</a>, an extraction of Mesa&rsquo;s GLSL compiler.</p>
+<p>Android and <a href="/posts/native-client/">Native Client</a> got GLSL through glsl-optimizer. Windows and Xbox 360 got HLSL through <code>D3DXCompileShader</code> from the D3DX9 library:</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 200" width="100%" style="max-width:760px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ah2012" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect x="250" y="12" width="260" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="380.0" y="31.5" text-anchor="middle">.sc source</text>
+<rect x="250" y="72" width="260" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="380.0" y="91.5" text-anchor="middle">fcpp (C preprocessor)</text>
+<rect x="60" y="140" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="190.0" y="158" text-anchor="middle" font-weight="600">glsl-optimizer</text>
+<text x="190.0" y="174" text-anchor="middle" font-size="11" fill-opacity="0.75">GLSL → Android, Native Client</text>
+<rect x="440" y="140" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="570.0" y="158" text-anchor="middle" font-weight="600">D3DXCompileShader</text>
+<text x="570.0" y="174" text-anchor="middle" font-size="11" fill-opacity="0.75">DXBC → Windows, Xbox 360</text>
+<polyline points="380.0,42 380.0,72" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah2012)"/>
+<line x1="380.0" y1="102" x2="380.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<line x1="190.0" y1="122" x2="570.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="190.0,122 190.0,140" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah2012)"/>
+<polyline points="570.0,122 570.0,140" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah2012)"/>
+</svg>
+</div>
+<p>The output container from that first version, a uniform table (name, type, count, register) followed by the shader blob, is still the same shape today, just with more fields.</p>
+<h2 id="how-does-it-work">How does it work?</h2>
+<p>Take the simplest example in the repo, <code>vs_cubes.sc</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#66d9ef">input</span> a_position, a_color0
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#960050;background-color:#1e0010">$</span><span style="color:#66d9ef">output</span> v_color0
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#75715e">#include &#34;../common/common.sh&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#66d9ef">void</span> main()
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>	gl_Position <span style="color:#f92672">=</span> mul(u_modelViewProj, <span style="color:#66d9ef">vec4</span>(a_position, <span style="color:#ae81ff">1.0</span>) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>	v_color0 <span style="color:#f92672">=</span> a_color0;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>}
+</span></span></code></pre></div><p>Next to it sits <code>varying.def.sc</code>, which is the only place where types and semantics of inputs and outputs are declared:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#66d9ef">vec4</span> v_color0    <span style="color:#f92672">:</span> COLOR0    <span style="color:#f92672">=</span> <span style="color:#66d9ef">vec4</span>(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#66d9ef">vec3</span> a_position  <span style="color:#f92672">:</span> POSITION;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#66d9ef">vec4</span> a_color0    <span style="color:#f92672">:</span> COLOR0;
+</span></span></code></pre></div><p>A typical compile looks like this:</p>
+<pre tabindex="0"><code>shaderc -f vs_cubes.sc --type vertex --platform windows -p s_5_0 -i src -o vs_cubes.bin
+</code></pre><p>Then compiling it takes these steps:</p>
+<p><strong>1. Preprocess, first pass.</strong> The source goes through the C preprocessor once, with the platform, language and shader type defines set, so that includes are pulled in and any <code>#if</code> around the <code>$input</code> and <code>$output</code> lines is resolved.</p>
+<p><strong>2. Parse the <code>$input</code> and <code>$output</code> lines.</strong> These are not preprocessor directives. <code>shaderc</code> reads them off the top of the preprocessed text and strips them. They list which of the varyings from <code>varying.def.sc</code> this shader uses. <code>shaderc</code> also hashes the sorted list so that at runtime bgfx can verify a vertex shader&rsquo;s outputs match a fragment shader&rsquo;s inputs.</p>
+<p><strong>3. Build a preamble.</strong> This is where the target language is decided, and it is done by generating text and prepending it to the source. For HLSL-family targets the preamble starts with the type aliases:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span>	preprocessor.writef(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>		<span style="color:#e6db74">&#34;#define lowp</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>		<span style="color:#e6db74">&#34;#define mediump</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>		<span style="color:#e6db74">&#34;#define highp</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>		<span style="color:#e6db74">&#34;#define ivec2 int2</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>		<span style="color:#e6db74">&#34;#define ivec3 int3</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>		<span style="color:#e6db74">&#34;#define ivec4 int4</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>		<span style="color:#e6db74">&#34;#define uvec2 uint2</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>		<span style="color:#e6db74">&#34;#define uvec3 uint3</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>		<span style="color:#e6db74">&#34;#define uvec4 uint4</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>		<span style="color:#e6db74">&#34;#define vec2 float2</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>		<span style="color:#e6db74">&#34;#define vec3 float3</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>		<span style="color:#e6db74">&#34;#define vec4 float4</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>		<span style="color:#e6db74">&#34;#define mat2 float2x2</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>		<span style="color:#e6db74">&#34;#define mat3 float3x3</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>		<span style="color:#e6db74">&#34;#define mat4 float4x4</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>		);
+</span></span></code></pre></div><p>And then the actual trick. GLSL has <code>void main()</code> with globals for inputs and outputs. HLSL wants an entry point with typed, semantic-annotated parameters and a return struct. <code>shaderc</code> generates a macro for that from the varyings, roughly for the vertex shader above:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hlsl" data-lang="hlsl"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">struct</span> Output
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>	vec4 gl_Position <span style="color:#f92672">:</span> SV_POSITION;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#75715e">#define gl_Position _varying_.gl_Position</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>	vec4 v_color0 <span style="color:#f92672">:</span> COLOR0;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#75715e">#define v_color0 _varying_.v_color0</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>};
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span><span style="color:#75715e">#define void_main() \</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>Output main( <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>	vec3 a_position <span style="color:#f92672">:</span> POSITION <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>	, vec4 a_color0 <span style="color:#f92672">:</span> COLOR0 <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>	) <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>{ <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>	Output _varying_; <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>	v_color0 <span style="color:#f92672">=</span> vec4(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span><span style="color:#75715e">#define __RETURN__ \</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>	} <span style="color:#75715e">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>	<span style="color:#66d9ef">return</span> _varying_
+</span></span></code></pre></div><p>The <code>vec3</code> and <code>vec4</code> in there are fine, because the type aliases above turn them into <code>float3</code> and <code>float4</code> on the way through. <code>smooth</code> and <code>flat</code> from <code>varying.def.sc</code> are rewritten to <code>linear</code> and <code>nointerpolation</code> while the struct is being generated.</p>
+<p><strong>4. Patch the source.</strong> The shader still says <code>void main()</code>. <code>shaderc</code> finds it and overwrites one byte, the space, with an underscore, so it now reads <code>void_main()</code> and expands to the macro above. For vertex shaders it then finds the closing brace of <code>main</code> and inserts <code>__RETURN__;</code> in front of it. That is the entire &ldquo;translation&rdquo; of the entry point: one byte and one string insert.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>	<span style="color:#f92672">*</span><span style="color:#66d9ef">const_cast</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">char</span><span style="color:#f92672">*&gt;</span>(entry.getPtr() <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>) <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;_&#39;</span>;
+</span></span></code></pre></div><p>The fragment shader side is the same idea, except <code>main</code> stays <code>void</code> and outputs become <code>out</code> parameters. <code>gl_FragColor</code> becomes <code>bgfx_FragData0 : SV_TARGET0</code>, <code>gl_FragCoord</code> becomes a <code>SV_POSITION</code> parameter, <code>gl_FrontFacing</code> is <code>SV_IsFrontFace</code>. Which of these get added to the signature is decided by searching the source text for the identifier.</p>
+<p><strong>5. Preprocess, second pass.</strong> The preamble plus the patched source go through the preprocessor again, and this time the macros do their work. <code>void_main()</code> expands, <code>vec4</code> becomes <code>float4</code>, and <code>bgfx_shader.sh</code>, which the shader included through <code>common.sh</code>, supplies the rest. That header is where <code>SAMPLER2D</code>, <code>texture2D</code>, <code>mul</code>, <code>mtxFromRows</code>, <code>vec4_splat</code> and friends are defined per language. For HLSL it wraps texture and sampler pairs into structs so that GLSL-style <code>texture2D(s_tex, uv)</code> works; for GLSL it defines <code>mul(a, b)</code> as <code>a * b</code>. The header, not the compiler, is where most of the language knowledge lives:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-glsl" data-lang="glsl"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#75715e">// HLSL</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#75715e">#define SAMPLER2D(_name, _reg) \</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>	<span style="color:#66d9ef">uniform</span> SamplerState _name <span style="color:#960050;background-color:#1e0010">##</span> Sampler <span style="color:#f92672">:</span> REGISTER(s, _reg); <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>	<span style="color:#66d9ef">uniform</span> Texture2D    _name <span style="color:#960050;background-color:#1e0010">##</span> Texture <span style="color:#f92672">:</span> REGISTER(t, _reg); <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>	<span style="color:#66d9ef">static</span> BgfxSampler2D _name <span style="color:#f92672">=</span> { _name <span style="color:#960050;background-color:#1e0010">##</span> Sampler, _name <span style="color:#960050;background-color:#1e0010">##</span> Texture }
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span><span style="color:#75715e">// GLSL</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span><span style="color:#75715e">#define SAMPLER2D(_name, _reg) uniform sampler2D _name</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span><span><span style="color:#75715e">#define mul(_a, _b) ( (_a) * (_b) )</span>
+</span></span></code></pre></div><p>For <code>vs_cubes.sc</code>, after that pass, the entry point FXC sees is roughly:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hlsl" data-lang="hlsl"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">struct</span> Output
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>	<span style="color:#66d9ef">float4</span> gl_Position <span style="color:#f92672">:</span> SV_POSITION;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>	<span style="color:#66d9ef">float4</span> v_color0 <span style="color:#f92672">:</span> COLOR0;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>};
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>Output main(<span style="color:#66d9ef">float3</span> a_position <span style="color:#f92672">:</span> POSITION, <span style="color:#66d9ef">float4</span> a_color0 <span style="color:#f92672">:</span> COLOR0)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>	Output _varying_;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>	_varying_.v_color0 <span style="color:#f92672">=</span> <span style="color:#66d9ef">float4</span>(<span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">0.0</span>, <span style="color:#ae81ff">1.0</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>	_varying_.gl_Position <span style="color:#f92672">=</span> mul(u_modelViewProj, <span style="color:#66d9ef">float4</span>(a_position, <span style="color:#ae81ff">1.0</span>) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>	_varying_.v_color0 <span style="color:#f92672">=</span> a_color0;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>	<span style="color:#66d9ef">return</span> _varying_;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>}
+</span></span></code></pre></div><p>Above that sits the rest of <code>bgfx_shader.sh</code>: built-in uniforms, <code>mul</code>, splat helpers, the lot. <code>--preprocess</code> dumps this text. When a target compiler complains, the code it is complaining about is this, not the <code>.sc</code> you wrote.</p>
+<p><strong>6. Hand it to a real compiler.</strong> The preprocessed text is now legal GLSL or legal HLSL, and it goes to FXC, DXC, Glslang, or whatever the profile wants. What comes back is the shader binary. Uniform and sampler reflection is taken from the compiler that produced it: <code>D3DReflect</code> after FXC, DXC&rsquo;s reflection blob after DXIL, Glslang&rsquo;s live uniforms or SPIRV-Cross resources after anything that went through SPIR-V. <code>shaderc</code> writes that into its own container, ahead of the shader blob, together with the <code>$input</code> and <code>$output</code> hashes from step 2.</p>
+<h2 id="before-and-after-glsl-optimizer">Before and after glsl-optimizer</h2>
+<p>This is what <code>shaderc</code> looked like just before the glsl-optimizer removal in August 2026, with every target it had accumulated:</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 540" width="100%" style="max-width:940px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ahBefore" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect x="300" y="12" width="340" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="470.0" y="31.5" text-anchor="middle">.sc source + varying.def.sc + bgfx_shader.sh</text>
+<rect x="300" y="72" width="340" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="470.0" y="91.5" text-anchor="middle">fcpp (C preprocessor)</text>
+<rect x="95" y="150" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="168" text-anchor="middle" font-weight="600">GLSL-style patching</text>
+<text x="225.0" y="184" text-anchor="middle" font-size="11" fill-opacity="0.75">attribute/varying, #version, #extension</text>
+<rect x="20" y="240" width="205" height="58" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4"/>
+<text x="122.5" y="258" text-anchor="middle" font-weight="600">glsl-optimizer</text>
+<text x="122.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">Mesa GLSL IR → GLSL / ESSL</text>
+<text x="122.5" y="288" text-anchor="middle" font-size="11" fill-opacity="0.75">GLSL 1.20–4.00, ESSL 1.00–3.00</text>
+<rect x="245" y="240" width="175" height="58" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="332.5" y="258" text-anchor="middle" font-weight="600">pass-through</text>
+<text x="332.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">GLSL 4.10+, ESSL 3.10–3.20</text>
+<text x="332.5" y="288" text-anchor="middle" font-size="11" fill-opacity="0.75">no validation at all</text>
+<rect x="95" y="340" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="358" text-anchor="middle" font-weight="600">GLSL / ESSL text</text>
+<text x="225.0" y="374" text-anchor="middle" font-size="11" fill-opacity="0.75">OpenGL, OpenGL ES, WebGL</text>
+<rect x="560" y="150" width="280" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="700.0" y="168" text-anchor="middle" font-weight="600">HLSL-style patching</text>
+<text x="700.0" y="184" text-anchor="middle" font-size="11" fill-opacity="0.75">void_main(), Output struct, semantics</text>
+<rect x="440" y="240" width="165" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="522.5" y="258" text-anchor="middle" font-weight="600">FXC</text>
+<text x="522.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">D3DCompiler_47, d3d4linux</text>
+<rect x="620" y="240" width="125" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="682.5" y="258" text-anchor="middle" font-weight="600">DXC</text>
+<text x="682.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">DXCompiler, SM 6.x</text>
+<rect x="760" y="240" width="150" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="258" text-anchor="middle" font-weight="600">Glslang</text>
+<text x="835.0" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">HLSL front-end</text>
+<rect x="440" y="330" width="165" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="522.5" y="349.5" text-anchor="middle">DXBC → D3D11</text>
+<rect x="620" y="330" width="125" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="682.5" y="349.5" text-anchor="middle">DXIL → D3D12</text>
+<rect x="760" y="330" width="150" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="349.5" text-anchor="middle">SPIR-V</text>
+<rect x="760" y="405" width="150" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="424.5" text-anchor="middle">SPIRV-Tools optimizer</text>
+<rect x="600" y="480" width="100" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="650.0" y="498" text-anchor="middle" font-weight="600">SPIR-V</text>
+<text x="650.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">Vulkan</text>
+<rect x="710" y="480" width="110" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="765.0" y="498" text-anchor="middle" font-weight="600">SPIRV-Cross</text>
+<text x="765.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">MSL → Metal</text>
+<rect x="830" y="480" width="100" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="880.0" y="498" text-anchor="middle" font-weight="600">Tint</text>
+<text x="880.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">WGSL → WebGPU</text>
+<line x1="700.0" y1="194" x2="700.0" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<line x1="522.5" y1="220" x2="835.0" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="522.5,220 522.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="682.5,220 682.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="835.0,220 835.0,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="522.5,284 522.5,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="682.5,284 682.5,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="835.0,284 835.0,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="835.0,360 835.0,405" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<line x1="835.0" y1="435" x2="835.0" y2="458" stroke="currentColor" stroke-width="1.2"/>
+<line x1="650.0" y1="458" x2="880.0" y2="458" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="650.0,458 650.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="765.0,458 765.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="880.0,458 880.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="470.0,42 470.0,72" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<line x1="470.0" y1="102" x2="470.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<line x1="225.0" y1="122" x2="700.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="225.0,122 225.0,150" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="700.0,122 700.0,150" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<line x1="225.0" y1="194" x2="225.0" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<line x1="122.5" y1="220" x2="332.5" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="122.5,220 122.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="332.5,220 332.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+<polyline points="122.5,298 122.5,320 225.0,320" fill="none" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="332.5,298 332.5,320 225.0,320" fill="none" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="225.0,320 225.0,340" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahBefore)"/>
+</svg>
+</div>
+<p>The left side is the legacy. glsl-optimizer&rsquo;s front-end was Mesa as of the mid-2010s, and it never implemented GLSL 4.x, so anything above 4.00 (and ESSL above 3.00) had, since 2017, been passed through untouched. In practice that meant a GLSL 4.30 shader got <strong>no validation at all</strong> at build time. You found out it was broken when the driver rejected it at runtime, on whichever machine happened to run it first. Meanwhile every extension needed on the GLSL side was detected by grepping the source for identifiers and prepending <code>#extension</code> lines. glsl-optimizer would then add its own <code>EXT</code> and <code>ARB</code> suffixes to the functions those extensions provide, which had to be patched back out so that the same shader would load across GLSL and ESSL versions, and the runtime would re-add whatever the driver actually needed.</p>
+<p>After removing glsl-optimizer and raising the minimum API versions on OpenGL to 4.3 and OpenGL ES to 3.0, and <a href="/posts/preprocessor/">replacing fcpp with a preprocessor of my own</a>, this is how the compiler looks today:</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 540" width="100%" style="max-width:940px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ahAfter" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect x="300" y="12" width="340" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="470.0" y="31.5" text-anchor="middle">.sc source + varying.def.sc + bgfx_shader.sh</text>
+<rect x="300" y="72" width="340" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="470.0" y="91.5" text-anchor="middle">shaderc::Preprocessor (pp.cpp)</text>
+<rect x="95" y="150" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="168" text-anchor="middle" font-weight="600">GLSL-style patching</text>
+<text x="225.0" y="184" text-anchor="middle" font-size="11" fill-opacity="0.75">attribute/varying, #version, a few #extension</text>
+<rect x="95" y="240" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="258" text-anchor="middle" font-weight="600">Glslang</text>
+<text x="225.0" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">GLSL front-end</text>
+<rect x="95" y="330" width="260" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="349.5" text-anchor="middle">SPIR-V</text>
+<rect x="95" y="405" width="260" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="424.5" text-anchor="middle">SPIRV-Tools optimizer</text>
+<rect x="95" y="480" width="260" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="225.0" y="498" text-anchor="middle" font-weight="600">SPIRV-Cross</text>
+<text x="225.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">GLSL 3.30–4.40, ESSL 3.00–3.20</text>
+<rect x="560" y="150" width="280" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="700.0" y="168" text-anchor="middle" font-weight="600">HLSL-style patching</text>
+<text x="700.0" y="184" text-anchor="middle" font-size="11" fill-opacity="0.75">void_main(), Output struct, semantics</text>
+<rect x="440" y="240" width="165" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="522.5" y="258" text-anchor="middle" font-weight="600">FXC</text>
+<text x="522.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">D3DCompiler_47, d3d4linux</text>
+<rect x="620" y="240" width="125" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="682.5" y="258" text-anchor="middle" font-weight="600">DXC</text>
+<text x="682.5" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">DXCompiler, SM 6.x</text>
+<rect x="760" y="240" width="150" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="258" text-anchor="middle" font-weight="600">Glslang</text>
+<text x="835.0" y="274" text-anchor="middle" font-size="11" fill-opacity="0.75">HLSL front-end</text>
+<rect x="440" y="330" width="165" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="522.5" y="349.5" text-anchor="middle">DXBC → D3D11</text>
+<rect x="620" y="330" width="125" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="682.5" y="349.5" text-anchor="middle">DXIL → D3D12</text>
+<rect x="760" y="330" width="150" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="349.5" text-anchor="middle">SPIR-V</text>
+<rect x="760" y="405" width="150" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="835.0" y="424.5" text-anchor="middle">SPIRV-Tools optimizer</text>
+<rect x="600" y="480" width="100" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="650.0" y="498" text-anchor="middle" font-weight="600">SPIR-V</text>
+<text x="650.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">Vulkan</text>
+<rect x="710" y="480" width="110" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="765.0" y="498" text-anchor="middle" font-weight="600">SPIRV-Cross</text>
+<text x="765.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">MSL → Metal</text>
+<rect x="830" y="480" width="100" height="44" rx="4" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2" />
+<text x="880.0" y="498" text-anchor="middle" font-weight="600">Tint</text>
+<text x="880.0" y="514" text-anchor="middle" font-size="11" fill-opacity="0.75">WGSL → WebGPU</text>
+<line x1="700.0" y1="194" x2="700.0" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<line x1="522.5" y1="220" x2="835.0" y2="220" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="522.5,220 522.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="682.5,220 682.5,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="835.0,220 835.0,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="522.5,284 522.5,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="682.5,284 682.5,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="835.0,284 835.0,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="835.0,360 835.0,405" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<line x1="835.0" y1="435" x2="835.0" y2="458" stroke="currentColor" stroke-width="1.2"/>
+<line x1="650.0" y1="458" x2="880.0" y2="458" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="650.0,458 650.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="765.0,458 765.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="880.0,458 880.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="470.0,42 470.0,72" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<line x1="470.0" y1="102" x2="470.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<line x1="225.0" y1="122" x2="700.0" y2="122" stroke="currentColor" stroke-width="1.2"/>
+<polyline points="225.0,122 225.0,150" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="700.0,122 700.0,150" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="225.0,194 225.0,240" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="225.0,284 225.0,330" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="225.0,360 225.0,405" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+<polyline points="225.0,435 225.0,480" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahAfter)"/>
+</svg>
+</div>
+<p>Every target now has a validated front-end; every target except FXC and DXC produces SPIR-V on the way. The GLSL / HLSL fork is still there: a shader can compile as <code>spirv</code> and fail as <code>430</code>, because those are not the same program.</p>
+<h3 id="could-it-be-simpler">Could it be simpler?</h3>
+<p>If you look carefully at the diagram, you might notice that the GLSL and HLSL patching could be unified, because Glslang accepts HLSL and SPIRV-Cross is already used to output GLSL/ESSL. This would simplify the preprocessor macros and the patching, but having two paths keeps some flexibility for when a new shader language needs to be added, which doesn&rsquo;t happen often.</p>
+<p>Another thing that might not be obvious is that the bgfx shader language could simply be HLSL. Some of the bgfx shaping happens with preprocessor macros, but it&rsquo;s feasible to do that transformation inside Glslang traversers, with plain HLSL as the front-end. It might look like the obvious choice to switch the default bgfx shader language to HLSL.</p>
+<p>The problem is that this would tie <code>shaderc</code> to Glslang even further, and I don&rsquo;t control where Glslang goes. This is not hypothetical. In April 2026 Glslang <a href="https://github.com/KhronosGroup/glslang/issues/4210">proposed deprecating and removing its HLSL front-end</a>, and the README now reads:</p>
+<blockquote>
+<p>The HLSL front-end is deprecated as of April 2026 and will be removed at the next major version of glslang. [&hellip;] Projects that require continued HLSL support should maintain a fork of glslang at the tag corresponding to the deprecation announcement.</p>
+</blockquote>
+<p>Had the bgfx shader language been HLSL, every existing shader would now need to move. Because the language is GLSL and HLSL is only an intermediate, the exposure is limited to the <code>spirv</code>, <code>metal</code> and <code>wgsl</code> paths, and those can be moved to another HLSL compiler, or to the GLSL front-end, without touching a single <code>.sc</code> file.</p>
+<p>It cuts the other way too. The WGSL path exists only because I carry a stripped-down copy of Tint for one translation, SPIR-V to WGSL. SPIRV-Cross already does SPIR-V to GLSL, ESSL and MSL for me, so in January 2026 I <a href="https://github.com/KhronosGroup/SPIRV-Cross/issues/2587">asked</a> whether it could do WGSL as well and let me drop Tint. The maintainer&rsquo;s answer:</p>
+<blockquote>
+<p>I don&rsquo;t have bandwidth to implement and maintain yet another backend. There is also no motivation to effectively duplicate the effort that Tint already does.</p>
+</blockquote>
+<p>Fair enough on bandwidth. But SPIRV-Cross is not one person&rsquo;s side project, it is a Khronos project, and WGSL is a W3C standard implemented in every major browser. If the &ldquo;Cross&rdquo; in SPIRV-Cross is understood as &ldquo;to every shading language&rdquo;, this is Khronos declining to cross to one of them, and pointing at Google&rsquo;s compiler instead. That is the whole reason <code>shaderc</code> looks the way it does. Every project in the pipeline solves its own problem, none of them shares bgfx&rsquo;s vision, and nobody is obliged to. The Frankenstein is not a design choice. It is what you get when you assemble a compiler from parts whose owners don&rsquo;t answer to you, and the seams between them are yours to maintain.</p>
+<h2 id="glsl-optimizer-was-a-great-idea">glsl-optimizer was a great idea!</h2>
+<p><a href="https://aras-p.info/blog/2010/09/29/glsl-optimizer/">glsl-optimizer</a> was built for Unity 3.0, where it made mobile shaders faster on drivers whose own compilers did little or no optimization. bgfx picked it up for the same reason: in 2012 the GLSL targets were Android and Native Client, and the shader compilers behind those were not something you wanted to trust with unoptimized code.</p>
+<p><strong>It is simple.</strong> The library is Mesa&rsquo;s GLSL front-end, Mesa&rsquo;s IR, Mesa&rsquo;s optimization passes, and one file, <code>ir_print_glsl_visitor.cpp</code>, that walks the IR and prints GLSL. Metal support, when it came, was a second printer, <code>ir_print_metal_visitor.cpp</code>. The public API is a dozen C functions in one header, and the ones you need are initialize, optimize, get status, get log, get output, cleanup. The initial <code>shaderc.cpp</code> used it in 30 lines.</p>
+<p><strong>The code is clear.</strong> Mesa&rsquo;s GLSL IR is a plain tree of <code>ir_instruction</code> nodes with a visitor.</p>
+<p><strong>It outputs source.</strong> This is the property I want to underline, because it is the one that mattered most and the one that is rarest. Most shader compilers produce an IR that a driver consumes: DXBC, DXIL, SPIR-V. Or there is no optimizer, because text is always treated as source, and there is no split between text as source and text as IR. glsl-optimizer showed, in 2010, that the sane way to deal with text as an interchange format is not to ship the shader as the author wrote it, but to run it through a real compiler with real optimization passes and print the result: the minimum code required for the shader, with every dead uniform and unreachable branch already gone. I made this same argument in the <a href="/posts/webgpu/#wgsl-webgpu-shading-language">WebGPU post</a> when defending WGSL as textual IR; glsl-optimizer is where I got this &ldquo;aha&rdquo; moment about how shader code/text should be treated.</p>
+<p><strong>Why it had to go.</strong> Its author stopped working on it in mid-2016 when Unity moved to a proper (proprietary) shader compiler. Mesa has since moved its optimization work to NIR, so the GLSL IR that glsl-optimizer is built on is no longer maintained upstream either. It&rsquo;s a dead project.</p>
+<h2 id="what-makes-shaderc-janky">What makes shaderc janky?</h2>
+<p>In a 2014 <a href="https://aras-p.info/blog/2014/03/28/cross-platform-shaders-in-2014/">survey of cross platform shaders</a>, bgfx was the example of the first, and least sophisticated, approach on the list:</p>
+<blockquote>
+<p>Write some helper macros to abstract away HLSL &amp; GLSL differences, and make everyone aware of all the differences.</p>
+</blockquote>
+<p>Twelve years later that is still what <code>shaderc</code> is, with real compilers bolted on behind the macros. A commenter on Hacker News <a href="https://news.ycombinator.com/item?id=44026828">put it</a> more bluntly, in a thread about shader compilation for SDL_GPU:</p>
+<blockquote>
+<p>BGFX uses a different approach. You basically write your shader in a GLSL-like language but it&rsquo;s all just (either very clever or very horrible) macro expansions that handles all the platform differences. With that you get a very performant backend for OpenGL, WebGL, Vulkan, Metal, Direct3D 11 and 12 and Playstation. It&rsquo;s shader compiler program basically does minimal source level transformations before handing it over to the platforms&rsquo; own shader compiler if available.</p>
+</blockquote>
+<p>I&rsquo;ll take &ldquo;either&rdquo;.</p>
+<p><strong>Error messages depend on the target.</strong> A shader that fails on <code>s_5_0</code> gives you an FXC error. The same shader on <code>spirv</code> gives you a Glslang error, on <code>metal</code> a Glslang error followed possibly by a SPIRV-Cross assertion, on <code>wgsl</code> any of those plus a Tint diagnostic, and on <code>430</code> a Glslang error in the GLSL dialect. They report different line numbers, because each one is looking at a different preamble prepended to your code. <code>shaderc</code> tries to help by printing the patched source around the reported line, but you still have to know which tool is talking.</p>
+<p><strong>Features are detected by substring.</strong> Whether <code>gl_FragDepth</code> appears in the source decides whether <code>SV_DEPTH</code> goes into the signature.</p>
+<p><strong>The entry point is a macro.</strong> For a vertex shader, everything about <code>main</code> is done by rewriting one byte and inserting <code>__RETURN__</code> before the last brace. An early <code>return;</code> inside a vertex shader&rsquo;s <code>main</code> is a compile error, because <code>main</code> now returns <code>Output</code>. The docs say attributes and varyings can only be accessed from <code>main()</code>, and now you know why: outside <code>main</code> there is no <code>_varying_</code> to expand to.</p>
+<p><strong>The dialect is real.</strong> <code>SAMPLER2D(s_tex, 0)</code> instead of <code>uniform sampler2D</code>, <code>vec4_splat(x)</code> instead of <code>vec4(x)</code>, <code>mul(a, b)</code> instead of <code>a * b</code>, <code>mtxFromRows</code> instead of a matrix constructor, etc. Each of those exists because the two sides disagree and the preprocessor cannot resolve the disagreement without a hint from you.</p>
+<h2 id="how-do-others-do-it">How do others do it?</h2>
+<p>The alternatives I have seen in other open source libraries and engines do not do much better. Most take a similar Frankenstein approach: a shader compiler assembled from parts of other shader compilers, written by different teams with different goals. Here is how the ones I know of get from what you write to what the GPU driver accepts, sorted into four groups by how much of the job they actually do themselves.</p>
+<p><strong>Janky.</strong> Text goes in, gets transformed, and is handed to whichever compiler the target uses. Each of those compilers is free to accept or reject the result on its own terms, so the same source can pass on one API and fail on another. That is the jank, and this is the <code>shaderc</code> family:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>You write</strong></th>
+<th><strong>How it gets there</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>bgfx <code>shaderc</code></strong></td>
+<td>GLSL dialect + macros</td>
+<td>preprocessor + text patching → FXC / DXC / Glslang → SPIRV-Cross / Tint</td>
+<td>DXBC, DXIL, SPIR-V, GLSL, ESSL, MSL, WGSL, PSSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ConfettiFX/The-Forge/tree/master/Common_3/Tools/ForgeShadingLanguage">The Forge</a></td>
+<td>FSL, an HLSL superset</td>
+<td>Python translator emits per-platform source → DXC / Glslang / metal / psslc</td>
+<td>DXIL, SPIR-V, metallib, PSSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/mosra/magnum">Magnum</a></td>
+<td>GLSL</td>
+<td>runtime <code>#define</code> assembly per GL version, Glslang plugin</td>
+<td>GLSL, SPIR-V</td>
+</tr>
+<tr>
+<td><a href="https://github.com/DiligentGraphics/DiligentCore">Diligent Engine</a></td>
+<td>HLSL (also GLSL, MSL, WGSL)</td>
+<td>own HLSL→GLSL text converter for OpenGL; FXC / DXC, Glslang → SPIR-V, Tint → WGSL elsewhere</td>
+<td>DXBC, DXIL, GLSL, SPIR-V, MSL, WGSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/FlaxEngine/FlaxEngine">Flax Engine</a></td>
+<td>HLSL</td>
+<td>FXC for SM5, DXC for SM6, Glslang HLSL front-end → SPIR-V</td>
+<td>DXBC, DXIL, SPIR-V</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Text translators.</strong> One parser of their own, one set of emitters of their own, and nothing you would call an optimizer in between. They print what you wrote in the target&rsquo;s language and let the driver&rsquo;s compiler do the rest. All three exist because a browser needed to compile somebody else&rsquo;s shading language safely:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>You write</strong></th>
+<th><strong>How it gets there</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/google/dawn/tree/main/src/tint">Dawn / Tint</a></td>
+<td>WGSL (also SPIR-V in)</td>
+<td>own readers → Tint IR → own writers, <a href="https://github.com/google/dawn/tree/main/src/tint/lang/core/ir/transform">legalization and dead code elimination only</a>, no optimizer</td>
+<td>SPIR-V, MSL, HLSL, GLSL, WGSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/gfx-rs/wgpu/tree/trunk/naga">wgpu / Naga</a></td>
+<td>WGSL (also GLSL, SPIR-V in)</td>
+<td>own front-ends → Naga IR → own back-ends, constant evaluation and pruning only</td>
+<td>SPIR-V, MSL, HLSL, GLSL, WGSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/google/angle/blob/main/README.md">ANGLE</a></td>
+<td>GLSL ES</td>
+<td>own translator → own AST → own back-ends, AST clean-up only, <a href="https://github.com/google/angle/blob/main/src/libANGLE/renderer/vulkan/doc/ShaderModuleCompilation.md">no SPIRV-Tools</a></td>
+<td>HLSL, GLSL, SPIR-V, MSL, WGSL</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A real front-end.</strong> One compiler parses and validates the source, so an error is the same error no matter which backend you asked for, and one source really does target every backend. What happens after that is somebody else&rsquo;s back-end: usually SPIR-V as the interchange format and SPIRV-Cross or Tint printing whatever the target wants. Some of these have a parser of their own in front (Godot, O3DE, Stride), but it only produces text for the next tool in line:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>You write</strong></th>
+<th><strong>How it gets there</strong></th>
+<th><strong>Outputs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/floooh/sokol-tools/blob/master/docs/sokol-shdc.md">sokol-shdc</a></td>
+<td>Vulkan GLSL 450 + <code>@</code> tags</td>
+<td>Glslang → SPIRV-Tools → SPIRV-Cross / Tint</td>
+<td>SPIR-V, GLSL, ESSL, HLSL, MSL, WGSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/libsdl-org/SDL_shadercross">SDL_GPU</a> (SDL_shadercross)</td>
+<td>HLSL or SPIR-V</td>
+<td>DXC → DXIL / SPIR-V, FXC → DXBC, SPIRV-Cross → MSL</td>
+<td>DXBC, DXIL, SPIR-V, MSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/google/filament">Filament</a></td>
+<td>ESSL 3.0</td>
+<td>Glslang → SPIRV-Tools → SPIRV-Cross / Tint</td>
+<td>SPIR-V, GLSL, ESSL, MSL, WGSL</td>
+</tr>
+<tr>
+<td><a href="https://godotengine.org/article/d3d12-adventures-in-shaderland/">Godot 4</a></td>
+<td>Godot shading language</td>
+<td>own parser emits GLSL → Glslang → SPIR-V → Mesa NIR → DXIL, SPIRV-Cross → MSL</td>
+<td>SPIR-V, DXIL, MSL, GLSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/o3de/o3de-azslc">O3DE</a></td>
+<td>AZSL, an HLSL superset</td>
+<td>mcpp → AZSLc → HLSL → DXC, SPIRV-Cross → MSL</td>
+<td>DXIL, SPIR-V, MSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/stride3d/stride">Stride</a></td>
+<td>SDSL, an HLSL superset</td>
+<td>own compiler → HLSL → FXC; SPIR-V pipeline in progress</td>
+<td>DXBC, SPIR-V, GLSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/turanszkij/WickedEngine">Wicked Engine</a></td>
+<td>HLSL SM6</td>
+<td>DXC → DXIL / SPIR-V, Metal Shader Converter → metallib</td>
+<td>DXBC, DXIL, SPIR-V, metallib</td>
+</tr>
+<tr>
+<td><a href="https://github.com/veldrid/veldrid-spirv">Veldrid</a></td>
+<td>Vulkan GLSL or SPIR-V</td>
+<td>Glslang → SPIR-V → SPIRV-Cross, at runtime</td>
+<td>HLSL, GLSL, ESSL, MSL</td>
+</tr>
+<tr>
+<td><a href="https://github.com/microsoft/ShaderConductor">ShaderConductor</a></td>
+<td>HLSL</td>
+<td>DXC → SPIR-V → SPIRV-Cross (archived 2025)</td>
+<td>DXIL, SPIR-V, GLSL, ESSL, MSL</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Actual compilers.</strong> Text in, optimization in the middle, and out comes whatever the API accepts, with no other compiler in between. Where the API accepts source, as OpenGL, Metal and WebGPU do, that source counts as the API&rsquo;s IR. By that definition the list is short:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>You write</strong></th>
+<th><strong>Straight to the API</strong></th>
+<th><strong>Still needs</strong></th>
+<th><strong>Optimization</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/shader-slang/slang">Slang</a></td>
+<td>Slang</td>
+<td>SPIR-V, MSL, WGSL, GLSL</td>
+<td>DXC / FXC for DXIL / DXBC, NVRTC for PTX</td>
+<td>own IR passes (specialization, inlining, SSA, dead code), then SPIRV-Tools optimizer at <code>-O1</code> and up</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aras-p/glsl-optimizer">glsl-optimizer</a> (2010-2016)</td>
+<td>GLSL</td>
+<td>GLSL, ESSL, MSL</td>
+<td>nothing</td>
+<td>Mesa&rsquo;s GLSL IR passes</td>
+</tr>
+</tbody>
+</table>
+<p>Slang qualifies everywhere except Direct3D, because nobody in these tables emits DXIL on their own. It is LLVM 3.7 bitcode that until 2025 had to be signed by Microsoft&rsquo;s <code>dxil.dll</code> before a driver would accept it, and the one open source emitter I know of is <a href="https://gitlab.freedesktop.org/mesa/mesa/-/tree/main/src/microsoft/compiler">Mesa&rsquo;s <code>nir_to_dxil</code></a>, which is <a href="https://godotengine.org/article/d3d12-adventures-in-shaderland/">how Godot got there</a>. glsl-optimizer is in the table because, for the one API it served, it was exactly this: parse, optimize, print what the driver accepts. The text translators above would qualify too if they optimized anything, and that is the situation glsl-optimizer was written to fix in 2010. The browsers have chosen to live with it.</p>
+<p>Only the last group comes close to having no seam, and the one Slang keeps is Direct3D&rsquo;s doing, not Slang&rsquo;s. Everything above it hands text to a compiler someone else maintains. The real front-ends hide that better than <code>shaderc</code> does, at the cost of Glslang and SPIRV-Cross being load-bearing, which is exactly the exposure the HLSL front-end deprecation just demonstrated. None of them removes it, and the ones that look cleaner usually support fewer targets.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>And yet <strong>it works!</strong> Fourteen years, eight target languages, every one of them added without a front-end rewrite. The structure that made this possible is the same one that makes the error messages inconsistent: <code>shaderc</code> owns the front of the pipeline, delegates the back, and the seam between them is text. Nearly everyone else in the tables above has that seam in the same place.</p>
+<p>The one real newcomer in those tables is <a href="https://github.com/shader-slang/slang">Slang</a>. It is an actual compiler: a front-end, an IR, modules, generics, and code generation for HLSL, GLSL, SPIR-V, MSL, WGSL, and even Slang round-trip from one source. That is the set bgfx needs. It came out of NVIDIA research and has been <a href="https://www.khronos.org/news/press/khronos-group-launches-slang-initiative-hosting-open-source-compiler-contributed-by-nvidia">hosted by Khronos</a> since late 2024. The press release claims that &ldquo;Valve compiled the entire production Source 2 HLSL codebase with Slang while modifying only 10 lines of code.&rdquo; It is the first thing in this space that solves the problem instead of routing around it. It did not exist in 2012, which is why <code>shaderc</code> is a preprocessor and a hand-off. If this were started today, Slang would be the approach it would take.</p>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <b><a href="https://github.com/sponsors/bkaradzic">sponsor</a></b>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>

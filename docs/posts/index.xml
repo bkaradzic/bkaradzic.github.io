@@ -6,7 +6,18 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 20 Aug 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Sep 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The bgfx shader compiler, 14 years of not being a compiler</title>
+      <link>https://bkaradzic.github.io/posts/shaderc-overview/</link>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/shaderc-overview/</guid>
+      
+      <description>Introduction bgfx renders through many backends, and each of them wants shaders in its own language: HLSL for Direct3D, Metal Shading Language on Apple platforms, GLSL for OpenGL and ESSL for OpenGL ES, SPIR-V for Vulkan, WGSL for WebGPU, etc. Nobody wants to write and maintain one shader per API. So bgfx has a shader compiler, shaderc, that takes a single source written in bgfx&amp;rsquo;s GLSL-flavoured dialect and produces a binary blob for whichever backend you ask for.</description>
+      
+    </item>
+    
     <item>
       <title>Writing a C preprocessor for bgfx shader compiler</title>
       <link>https://bkaradzic.github.io/posts/preprocessor/</link>
