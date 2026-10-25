@@ -96,7 +96,7 @@ I personally think that textual IR for shaders is actually not much different th
 
    `The shader's texture sample type (TextureSampleType::Depth) isn't compatible with the layout's texture sample type (TextureSampleType::Float) (it is only compatible with TextureSampleType::Float for the shader texture sample type).`
 
-### Dawn & Tint Bugs
+### Dawn & Tint bugs
 
 There are a few bugs I discovered while working with Dawn:
 

@@ -3,10 +3,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://bkaradzic.github.io/</loc>
-    <lastmod>2026-09-27T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://bkaradzic.github.io/posts/</loc>
-    <lastmod>2026-09-27T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://bkaradzic.github.io/posts/ideal-shader-compiler/</loc>
+    <lastmod>2026-10-24T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://bkaradzic.github.io/posts/shaderc-overview/</loc>
     <lastmod>2026-09-27T00:00:00+00:00</lastmod>

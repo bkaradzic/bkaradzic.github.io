@@ -6,7 +6,18 @@
     <description>Recent content in Posts on Branimir Karadžić&#39;s Home Page</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 27 Sep 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 24 Oct 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://bkaradzic.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Shader compiler survey</title>
+      <link>https://bkaradzic.github.io/posts/ideal-shader-compiler/</link>
+      <pubDate>Sat, 24 Oct 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://bkaradzic.github.io/posts/ideal-shader-compiler/</guid>
+      
+      <description>Introduction Over the years of maintaining shaderc I formed an opinion of how a shader compiler should look. Not the language, I don&amp;rsquo;t care much about the language (as long as it is C‑like 😉), but the thing itself: what goes in, what comes out, and how much of it I am allowed to touch. I made a list of what I think an ideal shader compiler looks like, shaped by offline and embedded use: platforms that do not allow compiling shaders at runtime, shipping optimized IR, keeping the executable small when a shader compiler is used at runtime, and being able to inject or skip stages.</description>
+      
+    </item>
+    
     <item>
       <title>The bgfx shader compiler, 14 years of not being a compiler</title>
       <link>https://bkaradzic.github.io/posts/shaderc-overview/</link>

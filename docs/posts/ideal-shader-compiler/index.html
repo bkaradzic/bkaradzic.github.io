@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Shader compiler survey | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Shader compiler survey | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Shader compiler survey | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Shader compiler survey | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Shader compiler survey | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/ideal-shader-compiler/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-10-24T00:00:00Z />
+    <meta property="article:published_time" content=2026-10-24T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/ideal-shader-compiler/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Shader compiler survey",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-10-24",
+        "description": "",
+        "wordCount":  3862 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-10-24",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Shader compiler survey" />
+<meta property="og:description" content="Introduction Over the years of maintaining shaderc I formed an opinion of how a shader compiler should look. Not the language, I don&rsquo;t care much about the language (as long as it is C‑like 😉), but the thing itself: what goes in, what comes out, and how much of it I am allowed to touch. I made a list of what I think an ideal shader compiler looks like, shaped by offline and embedded use: platforms that do not allow compiling shaders at runtime, shipping optimized IR, keeping the executable small when a shader compiler is used at runtime, and being able to inject or skip stages." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/ideal-shader-compiler/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-10-24T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-10-24T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Shader compiler survey"/>
+<meta name="twitter:description" content="Introduction Over the years of maintaining shaderc I formed an opinion of how a shader compiler should look. Not the language, I don&rsquo;t care much about the language (as long as it is C‑like 😉), but the thing itself: what goes in, what comes out, and how much of it I am allowed to touch. I made a list of what I think an ideal shader compiler looks like, shaped by offline and embedded use: platforms that do not allow compiling shaders at runtime, shipping optimized IR, keeping the executable small when a shader compiler is used at runtime, and being able to inject or skip stages."/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/ideal-shader-compiler/">
+    <link href="/style.min.f1ad54acd49d342dd448db491e319497bba663cf51d9fa5bdfba39b2f9006b50.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Shader compiler survey</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-10-24T00:00:00&#43;00:00" itemprop="datePublished"> Oct 24, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#the-ideal-shader-compiler">The ideal shader compiler</a></li>
+    <li><a href="#the-contenders">The contenders</a></li>
+    <li><a href="#benchmark">Benchmark</a>
+      <ul>
+        <li><a href="#source-to-something-a-driver-accepts">Source to something a driver accepts</a></li>
+        <li><a href="#spirv-in-spirv-out-optimizer-in-between">SPIR‑V in, SPIR‑V out, optimizer in between</a></li>
+        <li><a href="#spirv-to-source">SPIR‑V to source</a></li>
+        <li><a href="#wgsl-to-everything">WGSL to everything</a></li>
+        <li><a href="#binary-size">Binary size</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>Over the years of maintaining <a href="/posts/shaderc-overview/">shaderc</a> I formed an opinion of how a shader compiler should look. Not the language, I don&rsquo;t care much about the language (as long as it is C‑like 😉), but the thing itself: what goes in, what comes out, and how much of it I am allowed to touch. I made a list of what I think an ideal shader compiler looks like, shaped by offline and embedded use: platforms that do not allow compiling shaders at runtime, shipping optimized IR, keeping the executable small when a shader compiler is used at runtime, and being able to inject or skip stages. Then I went through what exists today, checked each one against the list, and benchmarked them all.</p>
+<h2 id="the-ideal-shader-compiler">The ideal shader compiler</h2>
+<p><a id="ideal-1"></a><strong>1. Text in, text out.</strong> The compiler must take text, lex and parse it, run some optimizations (or not), and be able to print text again. This is the <a href="https://aras-p.info/blog/2010/09/29/glsl-optimizer/">glsl‑optimizer</a> case: the driver is bad at optimizing, the API accepts only source, and I want at least basic passes done before the shader ships.</p>
+<p><a id="ideal-2"></a><strong>2. Any proprietary compiler can be attached at the end.</strong> On NDA (a.k.a. video game console) platforms compiling or generating code at runtime is not an option, and the platform compiler might sign the binary with an algorithm nobody outside knows. The last stage has to be replaceable with a black box.</p>
+<p><a id="ideal-3"></a><strong>3. Any part of it can be skipped.</strong> Including all of it. When I need a feature the compiler doesn&rsquo;t support, and there is no time to add it properly, I want to go straight through to the back‑end compiler instead of bolting something on the side.</p>
+<p><a id="ideal-4"></a><strong>4. Things can be injected at any stage.</strong> I must be able to get at the IR between stages and transform it into what I need.</p>
+<p><a id="ideal-5"></a><strong>5. It is configurable.</strong> Everything I don&rsquo;t need for the target I&rsquo;m building for should be strippable, and the binary should get smaller when I strip it.</p>
+<p><a id="ideal-6"></a><strong>6. It is a library.</strong> Embeddable, and not structured as a command line tool that happens to have a <code>main()</code> you can call. Can go from text to shader binary. Or could be limited, where we skip lexing, parsing and optimization and just convert IR to target shader binary. &ldquo;Embeddable&rdquo; in this context also means that shader compiler should not dominate binary size of executable if it&rsquo;s embedded. If we have 100MiB library that gets linked with 1MiB executable, that is not really &ldquo;embeddable&rdquo;.</p>
+<p><a id="ideal-7"></a><strong>7. The IR is serializable.</strong> So that optimized shader IR can be shipped, and translated/emitted for the specific backend at runtime. This doesn&rsquo;t work everywhere, but where it does it&rsquo;s a nice feature.</p>
+<p><a id="ideal-8"></a><strong>8. The IR can be assembled at runtime, without the compiler.</strong> If generating a shader is simple, and there is nothing to gain from optimization passes, I should be able to emit IR directly and link only the back‑end. This is a binary size optimization.</p>
+<p><a id="ideal-9"></a><strong>9. It runs where I build.</strong> It must produce shaders the API can ingest from any major desktop OS: Windows, Linux, and macOS.</p>
+<p><a id="ideal-10"></a><strong>10. It should be fast.</strong> Even if fast means reentrant and have to use multiple threads to achieve high speed when compiling multiple shaders. Compiling multiple shaders is not dependent on each other, so a shader compiler should not force sequential compiling.</p>
+<p>Nothing on this list is exotic. None of it is impossible or unheard of; it is how LLVM <a href="https://llvm.org/#:~:text=The%20LLVM%20Project%20is%20a%20collection%20of%20modular%20and%20reusable%20compiler%20and%20toolchain%20technologies%2E">describes</a> itself:</p>
+<blockquote>
+<p>The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.</p>
+</blockquote>
+<h2 id="the-contenders">The contenders</h2>
+<ul>
+<li><strong><a href="https://learn.microsoft.com/en-us/windows/win32/direct3dtools/fxc">FXC</a></strong>, <code>d3dcompiler_47.dll</code>. HLSL to DXBC, for Direct3D 11.</li>
+<li><strong><a href="https://github.com/microsoft/DirectXShaderCompiler">DXC</a></strong>, <code>dxcompiler.dll</code>. HLSL to DXIL for Direct3D 12, or to SPIR‑V.</li>
+<li><strong><a href="https://developer.apple.com/metal/">Metal compiler</a></strong>, <code>metal</code>. Metal Shading Language to AIR, for Metal.</li>
+<li><strong><a href="https://github.com/KhronosGroup/glslang">Glslang</a>+<a href="https://github.com/KhronosGroup/SPIRV-Tools">SPIRV‑Tools</a>+<a href="https://github.com/KhronosGroup/SPIRV-Cross">SPIRV‑Cross</a></strong>. The Khronos stack: GLSL or HLSL to SPIR‑V, an optimizer, and SPIR‑V back to GLSL, ESSL, HLSL or MSL. Counted as one compiler because nobody uses just one of them.</li>
+<li><strong><a href="https://dawn.googlesource.com/dawn/+/refs/heads/main/src/tint/">Tint</a></strong>, from Dawn. WGSL or SPIR‑V in; WGSL, SPIR‑V, HLSL, MSL or GLSL out.</li>
+<li><strong><a href="https://github.com/gfx-rs/wgpu/tree/trunk/naga">Naga</a></strong>, from wgpu. WGSL, SPIR‑V or GLSL in; WGSL, SPIR‑V, HLSL, MSL or GLSL out.</li>
+<li><strong><a href="https://docs.mesa3d.org/nir/index.html">NIR</a></strong>, from Mesa. The IR every Mesa driver compiles through: SPIR‑V or GLSL in, an optimizer, and next to the hardware back‑ends, writers for SPIR‑V, DXIL and MSL.</li>
+<li><strong><a href="https://shader-slang.org/">Slang</a></strong>. Slang or HLSL in; SPIR‑V, HLSL, MSL, WGSL or GLSL out, and DXIL through DXC.</li>
+</ul>
+<p>How they stack up against the list. The last row counts a plain yes as a point and anything qualified as partly:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>FXC</strong></th>
+<th><strong>DXC</strong></th>
+<th><strong>Metal</strong></th>
+<th><strong>Khronos stack</strong></th>
+<th><strong>Tint</strong></th>
+<th><strong>Naga</strong></th>
+<th><strong>NIR</strong></th>
+<th><strong>Slang</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Text in, text out</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+<td>yes, no optimizer</td>
+<td>yes, no optimizer</td>
+<td>GLSL in, MSL out, inside a driver</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>2. Proprietary back‑end</td>
+<td><em>is one</em></td>
+<td><em>is one</em></td>
+<td><em>is one</em></td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>3. Parts can be skipped</td>
+<td>no</td>
+<td>no</td>
+<td>partly</td>
+<td>yes</td>
+<td>partly</td>
+<td>yes</td>
+<td>yes</td>
+<td>partly</td>
+</tr>
+<tr>
+<td>4. Inject at any stage</td>
+<td>no</td>
+<td>partly</td>
+<td>no</td>
+<td>partly</td>
+<td>partly</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>5. Configurable</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>partly</td>
+<td>yes</td>
+<td>yes</td>
+<td>partly</td>
+<td>no</td>
+</tr>
+<tr>
+<td>6. Library</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>Rust only</td>
+<td>in‑tree only</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>7. Serializable IR</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>partly</td>
+<td>yes</td>
+<td>yes, per build</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>8. IR assembled at runtime</td>
+<td>no</td>
+<td>no</td>
+<td>no</td>
+<td>partly</td>
+<td>partly</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>9. Windows, Linux, macOS</td>
+<td>Windows</td>
+<td>yes</td>
+<td>no Linux</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>10. Fast, reentrant</td>
+<td>yes</td>
+<td>yes, per compiler instance</td>
+<td><em>is a process</em></td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes, one global session per thread</td>
+</tr>
+<tr>
+<td><strong>Yes / partly</strong></td>
+<td><strong>2</strong> / 1</td>
+<td><strong>3</strong> / 2</td>
+<td><strong>1</strong> / 2</td>
+<td><strong>7</strong> / 3</td>
+<td><strong>5</strong> / 5</td>
+<td><strong>8</strong> / 2</td>
+<td><strong>6</strong> / 4</td>
+<td><strong>5</strong> / 2</td>
+</tr>
+</tbody>
+</table>
+<p>A few notes on each.</p>
+<p><strong>FXC</strong> is one function, <a href="https://learn.microsoft.com/en-us/windows/win32/api/d3dcompiler/nf-d3dcompiler-d3dcompile"><code>D3DCompile</code></a>: HLSL in, DXBC out, nothing in between for you. Closed, Windows only, frozen at Shader Model 5.1. Close to zero on the list, and exactly what ideal <a href="/posts/ideal-shader-compiler/#ideal-2">2</a> is for.</p>
+<p><strong>DXC</strong> is LLVM 3.7 with an HLSL front‑end, so everything on my list exists inside it and almost none of it is reachable: <a href="https://github.com/microsoft/DirectXShaderCompiler/blob/main/include/dxc/dxcapi.h"><code>IDxcOptimizer</code></a> runs passes by name, and that is it. One 18MB DLL, whether you want the SPIR‑V back‑end or not. That back‑end matters, though. With Glslang&rsquo;s HLSL front‑end <a href="https://github.com/KhronosGroup/glslang/issues/4210">on its way out</a>, DXC is where HLSL for Vulkan is headed.</p>
+<p><strong>Metal compiler</strong> is Clang. <code>metal</code> compiles MSL to AIR, which is LLVM bitcode, as a command line tool and nothing else; the only in‑process Metal compiler is the one inside the OS. Apple ships it for macOS and Windows, not Linux.</p>
+<p><strong>Glslang+SPIRV‑Tools+SPIRV‑Cross</strong> does ideal <a href="/posts/ideal-shader-compiler/#ideal-1">1</a> in full, and is the best at <a href="/posts/ideal-shader-compiler/#ideal-3">3</a> by accident: three libraries by three sets of authors with a binary format between them, so every seam is a place to stop or to insert your own. The price is the same fact from the other side: nobody owns the whole, and a front‑end can be deprecated without the back‑end noticing. For HLSL the optimizer is not optional; what Glslang emits is not legal SPIR‑V until SPIRV‑Tools has legalized it. More on that in the benchmark.</p>
+<p><strong>Tint</strong> has a proper IR, a builder, transforms, and compile‑time switches for every reader and writer, which on paper covers ideals <a href="/posts/ideal-shader-compiler/#ideal-4">4</a>, <a href="/posts/ideal-shader-compiler/#ideal-5">5</a> and <a href="/posts/ideal-shader-compiler/#ideal-8">8</a>. In practice it is internal C++ with no stability promise, built by Dawn, and the public header <a href="https://github.com/google/dawn/blob/main/src/tint/api/tint.h"><code>tint.h</code></a> offers <code>Initialize</code>, <code>Shutdown</code> and <code>SpirvToWgsl</code>. No optimizer, by design. Its SPIR‑V reader does not feed the writers directly but round‑trips through a WGSL AST; remember this for the benchmark.</p>
+<p><strong>Naga</strong> is the closest to the list. <a href="https://docs.rs/naga/latest/naga/ir/struct.Module.html"><code>naga::Module</code></a> is plain public data: build it by hand, walk it, rewrite it, hand it to any back‑end. Every front‑end and back‑end can be compiled out, the module serializes, and front‑end, validator and back‑ends are separate calls. What it lacks is an optimizer and a C API. What comes out is legal and unoptimized; if you want it optimized, something else has to do it. It is written in Rust, and from C++ that means writing a C wrapper around its types yourself, and fixing it every time Naga changes them, which is often. For a Rust project it is the answer. For me it is ideal <a href="/posts/ideal-shader-compiler/#ideal-6">6</a> with a giant asterisk: for a C++ project it is close to non‑viable.</p>
+<p><strong>NIR</strong> is the IR inside every Mesa driver and Microsoft&rsquo;s OpenCL and OpenGL layers on Direct3D 12, which makes it the most used shader compiler there is, and it has most of what my list asks for, built for a driver&rsquo;s needs rather than mine. Passes are C functions called in any order, <a href="https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/src/compiler/nir/nir_builder.h"><code>nir_builder</code></a> builds IR by hand, <a href="https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/src/compiler/nir/nir_serialize.h"><code>nir_serialize</code></a> writes it out, and there is a real optimizer. Faith Ekstrand&rsquo;s <a href="https://www.gfxstrand.net/faith/blog/2022/01/in-defense-of-nir/">In defense of NIR</a> explains why it is built this way. SPIR‑V and GLSL come in; SPIR‑V, DXIL and MSL come out, next to the hardware back‑ends. None of it is a library: no public header, no stable API, no release, and the serialized form is for the build that wrote it. Each writer was written for one driver; the MSL one would not run without the driver&rsquo;s descriptor lowering, so it is missing from the benchmark.</p>
+<p><strong>Slang</strong> is the only one designed as a whole compiler for more than one target: its own front‑end, IR, passes and writers, a proper API, every platform, and modules stored as serialized IR. It takes ideal <a href="/posts/ideal-shader-compiler/#ideal-2">2</a> most seriously: FXC, DXC and the rest are &ldquo;downstream compilers&rdquo; it knows how to call, with a pass‑through mode that hands them the source untouched. What it lacks is the middle of my list: the IR is internal, with no API to read, transform or build it. And it comes as one piece: <code>slang-compiler.dll</code> is 26MB, plus a 6MB Glslang and SPIRV‑Tools for SPIR‑V.</p>
+<h2 id="benchmark">Benchmark</h2>
+<p>There is a <a href="https://kvark.github.io/naga/shader/2022/02/17/shader-translation-benchmark.html">shader translation benchmark</a> from 2022, by Naga&rsquo;s author, in‑process and with I/O excluded, in which Naga won every round by an order of magnitude. It is four years old; these are today&rsquo;s numbers.</p>
+<p><strong>Corpus.</strong> Every vertex, fragment and compute shader from the bgfx examples: 368 shaders, 120 vertex, 203 fragment and 45 compute, from a four‑line vertex shader to FSR and ASSAO. The same shaders exist in every language the compilers take:</p>
+<ul>
+<li>HLSL, 316K lines. Every shader starts with the same thousand lines of helper functions, most of which it never calls, and every compiler parses them again for every shader.</li>
+<li>SPIR‑V, optimized, 1.9MB.</li>
+<li>WGSL, 41K lines, and MSL, 37K lines.</li>
+</ul>
+<p><strong>Method.</strong> One C++ executable links Glslang, SPIRV‑Tools, SPIRV‑Cross and Tint statically, and loads <code>d3dcompiler_47.dll</code> and <code>dxcompiler.dll</code>. Naga gets its own Rust executable, and Slang is used through the DLLs from its release package. Shaders are loaded into memory first, every compile runs 10 times (5 for Slang), the fastest run counts, and the result is the sum over the corpus. Single thread. Metal has no library, so it is one process per shader, best of 3, with process startup measured separately.</p>
+<p><strong>Versions.</strong> Glslang 16.1.0, SPIRV‑Tools v2025.5 and Tint as pinned by Dawn <code>4b91cc492</code>; SPIRV‑Cross from August 2026; Naga 30.0.1; Slang v2026.19; DXC 1.10.2605; FXC 10.0.26100; Metal 32023.850; Mesa <code>e2ab668</code>. FXC and DXC at <code>-O3</code>, SPIRV‑Tools with its legalization and performance passes, Slang at its defaults, Tint driven the way its command line tool does it, Mesa through <a href="https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/src/compiler/spirv/nir_spirv.h"><code>spirv_to_nir</code></a>, then the passes and SPIR‑V writer of <a href="https://docs.mesa3d.org/drivers/zink.html">Zink</a>, its OpenGL‑on‑Vulkan driver, or <a href="https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/src/microsoft/spirv_to_dxil/spirv_to_dxil.h"><code>spirv_to_dxil</code></a>. MSVC release builds, Ryzen 9 7950X, Windows 10.</p>
+<h3 id="source-to-something-a-driver-accepts">Source to something a driver accepts</h3>
+<p>Every number here is all 368 shaders of the corpus, each compiled on its own to what its API&rsquo;s driver loads, best of ten runs, summed.</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 286" width="100%" style="max-width:760px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<text x="170" y="29" text-anchor="end">Naga, from WGSL</text>
+<rect x="180" y="14" width="5" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="193" y="29">0.2s</text>
+<text x="170" y="67" text-anchor="end">Tint, from WGSL</text>
+<rect x="180" y="52" width="15" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="203" y="67">0.6s</text>
+<text x="170" y="105" text-anchor="end">Glslang+SPIRV‑Tools</text>
+<rect x="180" y="90" width="118" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="306" y="105">5.0s</text>
+<text x="170" y="143" text-anchor="end">DXC</text>
+<rect x="180" y="128" width="142" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="330" y="143">6.0s</text>
+<text x="170" y="181" text-anchor="end">Slang</text>
+<rect x="180" y="166" width="348" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="536" y="181">14.7s</text>
+<text x="170" y="219" text-anchor="end">FXC</text>
+<rect x="180" y="204" width="366" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="554" y="219">15.4s</text>
+<text x="170" y="257" text-anchor="end">Metal</text>
+<rect x="180" y="242" width="530" height="22" rx="2" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1"/>
+<text x="718" y="257">22.4s</text>
+</svg>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Path</strong></th>
+<th style="text-align:right"><strong>Compiled</strong></th>
+<th style="text-align:right"><strong>Total</strong></th>
+<th style="text-align:right"><strong>Median per shader</strong></th>
+<th style="text-align:right"><strong>Slowest shader</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Naga</td>
+<td>WGSL → SPIR‑V</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">0.22s</td>
+<td style="text-align:right">85µs</td>
+<td style="text-align:right">39ms</td>
+</tr>
+<tr>
+<td>Tint</td>
+<td>WGSL → SPIR‑V</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">0.64s</td>
+<td style="text-align:right">408µs</td>
+<td style="text-align:right">94ms</td>
+</tr>
+<tr>
+<td>Glslang+SPIRV‑Tools</td>
+<td>HLSL → SPIR‑V</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">4.96s</td>
+<td style="text-align:right">3.4ms</td>
+<td style="text-align:right">915ms</td>
+</tr>
+<tr>
+<td>DXC</td>
+<td>HLSL → DXIL</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">5.99s</td>
+<td style="text-align:right">11.3ms</td>
+<td style="text-align:right">269ms</td>
+</tr>
+<tr>
+<td>DXC</td>
+<td>HLSL → SPIR‑V</td>
+<td style="text-align:right">366</td>
+<td style="text-align:right">8.56s</td>
+<td style="text-align:right">10.6ms</td>
+<td style="text-align:right">1053ms</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td>HLSL → WGSL</td>
+<td style="text-align:right">360</td>
+<td style="text-align:right">13.53s</td>
+<td style="text-align:right">32.7ms</td>
+<td style="text-align:right">102ms</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td>HLSL → HLSL</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">13.53s</td>
+<td style="text-align:right">32.5ms</td>
+<td style="text-align:right">100ms</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td>HLSL → MSL</td>
+<td style="text-align:right">366</td>
+<td style="text-align:right">13.68s</td>
+<td style="text-align:right">32.9ms</td>
+<td style="text-align:right">100ms</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td>HLSL → GLSL</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">13.71s</td>
+<td style="text-align:right">32.4ms</td>
+<td style="text-align:right">104ms</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td>HLSL → SPIR‑V</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">14.70s</td>
+<td style="text-align:right">33.4ms</td>
+<td style="text-align:right">183ms</td>
+</tr>
+<tr>
+<td>FXC</td>
+<td>HLSL → DXBC</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">15.43s</td>
+<td style="text-align:right">4.8ms</td>
+<td style="text-align:right">4088ms</td>
+</tr>
+<tr>
+<td>Metal</td>
+<td>MSL → AIR</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">22.37s</td>
+<td style="text-align:right">56.5ms</td>
+<td style="text-align:right">325ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Naga and Tint are in a different race.</strong> Neither reads HLSL, so they start from WGSL, and neither optimizes; they translate. What comes out needs no SPIRV‑Tools either: all 368 of Tint&rsquo;s modules pass the validator as emitted, 366 of Naga&rsquo;s do, the other two failing on a layout decoration on a workgroup array. Driver‑ready SPIR‑V comes out of Naga in 0.22s for the whole corpus and out of Tint in 0.64s. The rest of the table starts at 5s.</p>
+<p><strong>Glslang is fast, SPIRV‑Tools is not, and Glslang on its own is not enough.</strong> Parsing 316K lines of HLSL and emitting SPIR‑V takes Glslang 0.93s, 2.1ms per shader. But Glslang&rsquo;s own help warns that <code>-Od disables optimization; may cause illegal SPIR-V for HLSL</code>, and it does: 173 of the 368 modules fail the validator until SPIRV‑Tools has legalized them, and none after. So the two are a pair, and the pair takes 4.96s. Legalizing and optimizing is 81% of that. HLSL to MSL through the whole stack, Glslang, SPIRV‑Tools, SPIRV‑Cross, takes 5.1s, and the optimizer is 79% of it.</p>
+<p><strong>FXC is two compilers.</strong> Its median is 4.8ms, less than half of DXC&rsquo;s. Its total is 2.5 times DXC&rsquo;s. Three shaders from one example take 4.1s, 2.9s and 1.6s, more than the other 365 put together. The same example has the slowest shaders for DXC, SPIRV‑Tools, SPIRV‑Cross and Tint too, but there the worst case stays around a second. This is the FXC everybody who shipped a D3D11 game remembers.</p>
+<p><strong>DXC is LLVM, and it shows.</strong> Its floor is 11ms, for a shader Glslang and SPIRV‑Tools together finish in 3ms. And DXC to SPIR‑V is the same job as Glslang+SPIRV‑Tools, HLSL in, optimized SPIR‑V out: DXC takes 8.6s, Glslang and the optimizer 5.0s. DXC also failed two compute shaders that it compiles to DXIL without complaint, and that Glslang compiles to SPIR‑V.</p>
+<p><strong>Slang is the slowest way from HLSL to SPIR‑V.</strong> Three times the Khronos stack, 1.7 times DXC. Almost none of it depends on the target: printing HLSL back out costs the same 33ms per shader as emitting SPIR‑V. The time is in the front‑end. A one‑line vertex shader goes through in 0.5ms, so the 30ms is the thousand lines of helper functions in front of every shader, which Slang checks whether the shader calls them or not. On the other hand it has no bad day: its slowest shader is 183ms, where FXC, DXC and SPIRV‑Tools each have one around a second or more.</p>
+<p><strong>Slang is also stricter than the HLSL compilers.</strong> None of the 368 shaders compiled as they were, so the HLSL was edited until they did. FXC, DXC and Glslang accept all of this, Slang does not:</p>
+<ul>
+<li>A <code>static</code> global struct holding a sampler and a texture is &ldquo;global variable cannot have opaque type&rdquo;. 166 shaders; a macro that builds the struct where it is used gets around it.</li>
+<li>A texel offset passed through a helper into <code>SampleLevel</code> or <code>Load</code> has to be <code>constexpr</code>, even in a function nobody calls, which rejects every shader that includes the helper.</li>
+<li><code>min16float</code> and friends don&rsquo;t exist.</li>
+<li>Two <code>for (int k ...)</code> loops in one function are an ambiguous <code>k</code>.</li>
+<li>When the output is WGSL, fragment outputs have to be returned in a struct; an <code>out float4 color : SV_TARGET0</code> parameter on the entry point is &ldquo;system value semantic not supported&rdquo;.</li>
+</ul>
+<p>With those five edits to the shaders, Slang compiles all 368 to SPIR‑V, GLSL and HLSL, 366 to MSL, and 360 to WGSL. What is left are things the target doesn&rsquo;t have, like <code>InterlockedAdd</code> in WGSL.</p>
+<p><strong>Metal is a process.</strong> Starting <code>metal</code> and doing nothing costs 10ms. Take that out and it is still 47ms per shader, 18.7s for the corpus, on the easiest input of the lot: 37K lines of machine‑written MSL against the 316K lines of HLSL the others chew through.</p>
+<h3 id="spirv-in-spirv-out-optimizer-in-between">SPIR‑V in, SPIR‑V out, optimizer in between</h3>
+<p>NIR and SPIRV‑Tools do the same job here: take the SPIR‑V Glslang emits with optimization off, optimize it, write SPIR‑V. Naga and Tint are in the table for scale; they translate the optimized corpus and optimize nothing.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Input</strong></th>
+<th style="text-align:right"><strong>Compiled</strong></th>
+<th style="text-align:right"><strong>Total</strong></th>
+<th style="text-align:right"><strong>Median per shader</strong></th>
+<th style="text-align:right"><strong>Slowest shader</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Naga</td>
+<td>SPIR‑V, optimized</td>
+<td style="text-align:right">358</td>
+<td style="text-align:right">0.03s</td>
+<td style="text-align:right">36µs</td>
+<td style="text-align:right">2ms</td>
+</tr>
+<tr>
+<td>Tint</td>
+<td>SPIR‑V, optimized</td>
+<td style="text-align:right">359</td>
+<td style="text-align:right">0.97s</td>
+<td style="text-align:right">720µs</td>
+<td style="text-align:right">128ms</td>
+</tr>
+<tr>
+<td>Mesa, NIR</td>
+<td>SPIR‑V, unoptimized</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">3.80s</td>
+<td style="text-align:right">169µs</td>
+<td style="text-align:right">1111ms</td>
+</tr>
+<tr>
+<td>SPIRV‑Tools</td>
+<td>SPIR‑V, unoptimized</td>
+<td style="text-align:right">368</td>
+<td style="text-align:right">4.03s</td>
+<td style="text-align:right">1.23ms</td>
+<td style="text-align:right">909ms</td>
+</tr>
+<tr>
+<td>Mesa, NIR → DXIL</td>
+<td>SPIR‑V, unoptimized</td>
+<td style="text-align:right">366</td>
+<td style="text-align:right">7.12s</td>
+<td style="text-align:right">472µs</td>
+<td style="text-align:right">2160ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>NIR&rsquo;s optimizer is seven times cheaper per shader and costs the same in total.</strong> The median shader spends 169µs in NIR and 1.23ms in SPIRV‑Tools. Reading SPIR‑V is 41ms of Mesa&rsquo;s 3.80s and writing it is 40ms; everything else is lowering and the optimizer loop. But 3.55s of it goes to the 20 shaders of one example, <code>54-s2h</code>, where SPIRV‑Tools spends 2.79s. On the other 348 shaders NIR is done in 0.17s and SPIRV‑Tools needs 1.24s.</p>
+<p><strong>From HLSL, Glslang+NIR is the Khronos pipeline with Mesa&rsquo;s optimizer in the middle.</strong> Same HLSL, same front‑end, NIR where SPIRV‑Tools was: 4.74s to SPIR‑V against 4.96s, and 8.04s to DXIL against DXC&rsquo;s 5.99s from HLSL directly.</p>
+<p><strong>What comes out is written for a driver.</strong> Zink has NIR scalarize everything and leaves the vectors to the driver underneath, so the output is 8.1MB for the corpus against SPIRV‑Tools&rsquo; 1.9MB, and the <code>s2h</code> gather shader goes in at 72KB and comes out at 1.3MB. It is also not legal: the validator rejects 300 of the 368 modules, each on a uniform block with a matrix and no <code>MatrixStride</code>. The writer&rsquo;s native Vulkan mode is new this year, and nothing ships against it yet.</p>
+<p><strong>DXIL is the long way round.</strong> <code>spirv_to_dxil</code> is the compiler of <a href="https://gitlab.freedesktop.org/mesa/mesa/-/tree/main/src/microsoft/vulkan">Dozen</a>, Mesa&rsquo;s Vulkan driver on top of Direct3D 12, as a library that WebGPU on Direct3D 12 uses too: SPIR‑V to NIR, then NIR to LLVM bitcode written by hand, without LLVM. Two shaders failed, one on <code>SPV_EXT_shader_viewport_index_layer</code>, which Dozen does not advertise, and one that crashed the writer.</p>
+<h3 id="spirv-to-source">SPIR‑V to source</h3>
+<p>Totals are over the 358 shaders that Naga, SPIRV‑Cross and Tint could all translate to all targets. Mesa appears for the one thing it writes:</p>
+<table>
+<thead>
+<tr>
+<th><strong>SPIR‑V to</strong></th>
+<th style="text-align:right"><strong>Naga</strong></th>
+<th style="text-align:right"><strong>SPIRV‑Cross</strong></th>
+<th style="text-align:right"><strong>Tint</strong></th>
+<th style="text-align:right"><strong>Mesa (with optimizer)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSL</td>
+<td style="text-align:right">38ms</td>
+<td style="text-align:right">152ms</td>
+<td style="text-align:right">1005ms</td>
+<td style="text-align:right">-</td>
+</tr>
+<tr>
+<td>HLSL</td>
+<td style="text-align:right">33ms</td>
+<td style="text-align:right">152ms</td>
+<td style="text-align:right">1095ms</td>
+<td style="text-align:right">-</td>
+</tr>
+<tr>
+<td>GLSL</td>
+<td style="text-align:right">31ms</td>
+<td style="text-align:right">148ms</td>
+<td style="text-align:right">1133ms</td>
+<td style="text-align:right">-</td>
+</tr>
+<tr>
+<td>WGSL</td>
+<td style="text-align:right">30ms</td>
+<td style="text-align:right">-</td>
+<td style="text-align:right">787ms</td>
+<td style="text-align:right">-</td>
+</tr>
+<tr>
+<td>SPIR‑V</td>
+<td style="text-align:right">30ms</td>
+<td style="text-align:right">-</td>
+<td style="text-align:right">970ms</td>
+<td style="text-align:right">2426ms</td>
+</tr>
+<tr>
+<td>Median per shader, MSL</td>
+<td style="text-align:right">45µs</td>
+<td style="text-align:right">87µs</td>
+<td style="text-align:right">730µs</td>
+<td style="text-align:right">-</td>
+</tr>
+</tbody>
+</table>
+<p>Naga is 4x faster than SPIRV‑Cross and 26x faster than Tint. In 2022 it was 10x and 80x. The order has not changed and the gaps are smaller, but with a different corpus on a different machine that is all it says: the others may have got faster, or Naga slower.</p>
+<p><strong>Tint&rsquo;s number is the round trip.</strong> SPIR‑V to IR, IR to WGSL AST, AST back to IR, IR to target. Printing WGSL, where it stops halfway, is its fastest path, and still 5x slower than SPIRV‑Cross at anything.</p>
+<p><strong>Not all SPIR‑V is welcome.</strong> SPIRV‑Cross took all 368 shaders for GLSL, HLSL and MSL. Tint rejected 9: eight use <code>ImageGatherExtended</code> and one <code>SPV_EXT_shader_viewport_index_layer</code>. Naga rejected the same 9, and panicked in its SPIR‑V front‑end on a tenth. By design: both read the subset of SPIR‑V that maps onto WGSL, not Vulkan&rsquo;s SPIR‑V.</p>
+<h3 id="wgsl-to-everything">WGSL to everything</h3>
+<p>The comparison Tint and Naga were built for. Totals over the 365 shaders that both could translate to all targets:</p>
+<table>
+<thead>
+<tr>
+<th><strong>WGSL to</strong></th>
+<th style="text-align:right"><strong>Naga</strong></th>
+<th style="text-align:right"><strong>Tint</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IR, parsed and validated</td>
+<td style="text-align:right">201ms</td>
+<td style="text-align:right">431ms</td>
+</tr>
+<tr>
+<td>SPIR‑V</td>
+<td style="text-align:right">221ms</td>
+<td style="text-align:right">629ms</td>
+</tr>
+<tr>
+<td>MSL</td>
+<td style="text-align:right">224ms</td>
+<td style="text-align:right">663ms</td>
+</tr>
+<tr>
+<td>HLSL</td>
+<td style="text-align:right">221ms</td>
+<td style="text-align:right">741ms</td>
+</tr>
+<tr>
+<td>GLSL</td>
+<td style="text-align:right">218ms</td>
+<td style="text-align:right">779ms</td>
+</tr>
+<tr>
+<td>Median per shader, SPIR‑V</td>
+<td style="text-align:right">84µs</td>
+<td style="text-align:right">407µs</td>
+</tr>
+</tbody>
+</table>
+<p>From WGSL, Naga is about 3x faster than Tint, against 13x in 2022. Most of the difference is in the front‑ends: Naga spends 201ms parsing and validating WGSL it reads from SPIR‑V in 30ms. Once the module exists, writing it out costs Naga around 20ms for any target and Tint 200-350ms. Tint accepted all 368. Naga&rsquo;s GLSL writer panicked on three compute shaders.</p>
+<h3 id="binary-size">Binary size</h3>
+<p>The other half of ideal <a href="/posts/ideal-shader-compiler/#ideal-6">6</a>: the size of an executable that does the compiles above and nothing else:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>What is in it</strong></th>
+<th style="text-align:right"><strong>Size</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Naga</td>
+<td>SPIR‑V reader, WGSL writer</td>
+<td style="text-align:right">1.3MB</td>
+</tr>
+<tr>
+<td>Glslang</td>
+<td>GLSL and HLSL front‑ends, SPIR‑V writer</td>
+<td style="text-align:right">2.1MB</td>
+</tr>
+<tr>
+<td>SPIRV‑Cross</td>
+<td>GLSL, HLSL and MSL back‑ends</td>
+<td style="text-align:right">2.1MB</td>
+</tr>
+<tr>
+<td>Naga</td>
+<td>WGSL reader, SPIR‑V writer</td>
+<td style="text-align:right">2.2MB</td>
+</tr>
+<tr>
+<td>SPIRV‑Tools</td>
+<td>optimizer</td>
+<td style="text-align:right">2.8MB</td>
+</tr>
+<tr>
+<td>Naga</td>
+<td>everything</td>
+<td style="text-align:right">3.7MB</td>
+</tr>
+<tr>
+<td>FXC</td>
+<td><code>d3dcompiler_47.dll</code></td>
+<td style="text-align:right">4.7MB</td>
+</tr>
+<tr>
+<td>Tint</td>
+<td>SPIR‑V reader, WGSL writer</td>
+<td style="text-align:right">5.3MB</td>
+</tr>
+<tr>
+<td>Khronos stack</td>
+<td>Glslang+SPIRV‑Tools+SPIRV‑Cross</td>
+<td style="text-align:right">7.0MB</td>
+</tr>
+<tr>
+<td>Tint</td>
+<td>everything</td>
+<td style="text-align:right">8.0MB</td>
+</tr>
+<tr>
+<td>Mesa</td>
+<td>SPIR‑V reader, NIR with optimizer, SPIR‑V writer</td>
+<td style="text-align:right">8.6MB</td>
+</tr>
+<tr>
+<td>Mesa</td>
+<td>SPIR‑V reader, NIR with optimizer, DXIL writer</td>
+<td style="text-align:right">9.0MB</td>
+</tr>
+<tr>
+<td>DXC</td>
+<td><code>dxcompiler.dll</code> + <code>dxil.dll</code></td>
+<td style="text-align:right">19.7MB</td>
+</tr>
+<tr>
+<td>Slang</td>
+<td><code>slang-compiler.dll</code>+<code>slang.dll</code>+<code>slang-glslang.dll</code></td>
+<td style="text-align:right">32.3MB</td>
+</tr>
+<tr>
+<td>Metal</td>
+<td><code>metal.exe</code> alone</td>
+<td style="text-align:right">119MB</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Configurable means different things.</strong> Naga with one reader and one writer is a third of Naga with everything. Tint with one reader and one writer is still two thirds of Tint with everything, and four times Naga doing the same job. The Khronos stack is configurable by leaving a whole library out, which is coarse but works: SPIR‑V to MSL is SPIRV‑Cross alone, about 2MB; HLSL to SPIR‑V is Glslang plus the optimizer it cannot do without, about 5MB.</p>
+<p><strong>All of Naga is smaller than FXC.</strong> Five back‑ends, three front‑ends and a validator, in less space than one closed‑source HLSL compiler from 2012.</p>
+<p><strong>NIR&rsquo;s size is its optimizer.</strong> Of the 8.6MB, 7MB is read‑only data, almost all of it the match tables <a href="https://gitlab.freedesktop.org/mesa/mesa/-/blob/main/src/compiler/nir/nir_opt_algebraic.py"><code>nir_opt_algebraic</code></a> generates from its Python rule files. The reader and the writer are a few hundred kilobytes each. An optimizer is the one thing Naga lacks, and in Mesa it is 7MB of the binary.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>None of them is the ideal shader compiler. The API compilers, FXC, DXC and Metal, are ideal <a href="/posts/ideal-shader-compiler/#ideal-2">2</a> and nothing else: black boxes, one to three orders of magnitude slower than the translators. The Khronos stack is modular because it is three projects, which also means three sets of bugs and a deprecated HLSL front‑end, and it is still the fastest way from HLSL to SPIR‑V. Slang has the API and the targets, and an IR with no API to it. Naga is the fastest, the smallest, the most configurable, and the only one with a public IR, it has no optimizer, and it is written in Rust. NIR has the optimizer and a public IR, but it is not a library anyone can grab and add to a project.</p>
+<p>In Khronos&rsquo; <a href="https://members.khronos.org/document/dl/36688#page=26">2026 shader ecosystem survey</a> (Q11, &ldquo;Would a Higher‑Level Shader IR Benefit Your Project?&rdquo;, pages 26 and 27), nearly half of the respondents said their project would benefit from a standardized IR above SPIR‑V. An IR on its own is not much use; it needs a compiler around it, and that compiler is what the list above describes. None of it would have to be invented: every item on the list is implemented by somebody, and eight of ten by Naga alone. Nobody has put all ten in one library&hellip; Yet! 😉</p>
+<h2 id="references">References</h2>
+<ul>
+<li>
+<p>Shader translation benchmark<br>
+<a href="https://kvark.github.io/naga/shader/2022/02/17/shader-translation-benchmark.html">https://kvark.github.io/naga/shader/2022/02/17/shader-translation-benchmark.html</a></p>
+</li>
+<li>
+<p>2026 Real‑Time Shading Ecosystem Survey Report<br>
+<a href="https://members.khronos.org/document/dl/36688">https://members.khronos.org/document/dl/36688</a></p>
+</li>
+<li>
+<p>In defense of NIR<br>
+<a href="https://www.gfxstrand.net/faith/blog/2022/01/in-defense-of-nir/">https://www.gfxstrand.net/faith/blog/2022/01/in-defense-of-nir/</a></p>
+</li>
+</ul>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <b><a href="https://github.com/sponsors/bkaradzic">sponsor</a></b>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>
