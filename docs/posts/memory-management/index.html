@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en-us"><head><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43; | Branimir Karadžić&#39;s Home Page</title>
+<meta property="og:title" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:title" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta itemprop="name" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta name="application-name" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43; | Branimir Karadžić&#39;s Home Page" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="Branimir Karadžić&#39;s Home Page">
+<meta itemprop="description" content="Branimir Karadžić&#39;s Home Page" />
+<meta property="og:description" content="Branimir Karadžić&#39;s Home Page" />
+<meta name="twitter:description" content="Branimir Karadžić&#39;s Home Page" />
+
+<meta property="og:locale" content="en-us" />
+<meta name="language" content="en-us" />
+
+  <link rel="alternate" hreflang="en-us" href="https://bkaradzic.github.io/posts/memory-management/" title="English" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-11-16T00:00:00Z />
+    <meta property="article:published_time" content=2026-11-16T00:00:00Z />
+    <meta property="og:url" content="https://bkaradzic.github.io/posts/memory-management/" />
+
+    
+    <meta property="og:article:author" content="Branimir Karadžić" />
+    <meta property="article:author" content="Branimir Karadžić" />
+    <meta name="author" content="Branimir Karadžić" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Blocks with ownership: a novel approach to CPU and GPU memory in C++",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-11-16",
+        "description": "",
+        "wordCount":  3835 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-11-16",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "Branimir Karadžić\u0027s Home Page"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.123.7">
+
+    
+    <meta property="og:title" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43;" />
+<meta property="og:description" content="Introduction Every C and C&#43;&#43; programmer knows the contract: malloc(size) returns a pointer, and free(ptr) takes it back. The size is missing from the second half, free gets only the pointer.
+In case you&rsquo;re unfamiliar with how allocators work there is a great short introduction video about it, you can watch it here:
+malloc() is lying to you. Find out why, and how the illusion works! pic.twitter.com/pUjYVEqBSD
+&mdash; Dave W Plummer (@davepl1968) May 15, 2026 Most people visualize allocation as something like this:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bkaradzic.github.io/posts/memory-management/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-11-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2026-11-16T00:00:00+00:00" />
+
+
+
+    
+    <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43;"/>
+<meta name="twitter:description" content="Introduction Every C and C&#43;&#43; programmer knows the contract: malloc(size) returns a pointer, and free(ptr) takes it back. The size is missing from the second half, free gets only the pointer.
+In case you&rsquo;re unfamiliar with how allocators work there is a great short introduction video about it, you can watch it here:
+malloc() is lying to you. Find out why, and how the illusion works! pic.twitter.com/pUjYVEqBSD
+&mdash; Dave W Plummer (@davepl1968) May 15, 2026 Most people visualize allocation as something like this:"/>
+
+
+    
+
+    <link rel="canonical" href="https://bkaradzic.github.io/posts/memory-management/">
+    <link href="/style.min.f1ad54acd49d342dd448db491e319497bba663cf51d9fa5bdfba39b2f9006b50.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="https://bkaradzic.github.io/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+    
+</head>
+<body data-theme = "auto" class="notransition">
+
+<script src="/js/theme.min.8961c317c5b88b953fe27525839672c9343f1058ab044696ca225656c8ba2ab0.js" integrity="sha256-iWHDF8W4i5U/4nUlg5ZyyTQ/EFirBEaWyiJWVsi6KrA="></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="https://bkaradzic.github.io/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title>Home</title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        Home
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link active" href="/posts/">
+                        Posts
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="https://bkaradzic.github.io/bgfx/">
+                        Docs
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/pages/bio/">
+                        Bio
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Blocks with ownership: a novel approach to CPU and GPU memory in C&#43;&#43;</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-11-16T00:00:00&#43;00:00" itemprop="datePublished"> Nov 16, 2026 </time>
+                </div>
+                
+            </header>
+            
+    
+        
+            
+        
+    
+    <details class="toc" open>
+        <summary><b>Table of Contents</b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#history-of-composable-allocators">History of composable allocators</a>
+      <ul>
+        <li><a href="#alexandrescus-talk">Alexandrescu&rsquo;s talk</a></li>
+      </ul>
+    </li>
+    <li><a href="#bxblk">bx::Blk</a>
+      <ul>
+        <li><a href="#layout">Layout</a></li>
+        <li><a href="#unique-pointer-without-automatic-release">Unique pointer without automatic release</a></li>
+        <li><a href="#the-block-knows-its-allocator">The block knows its allocator</a></li>
+        <li><a href="#invalid-blocks-say-why">Invalid blocks say why</a></li>
+        <li><a href="#one-entry-point">One entry point</a></li>
+        <li><a href="#allocators">Allocators</a></li>
+        <li><a href="#cpu-and-gpu-memory">CPU and GPU memory</a></li>
+        <li><a href="#memory-tracking-and-debugging">Memory tracking and debugging</a></li>
+        <li><a href="#general-purpose-heap-from-the-same-parts">General purpose heap from the same parts</a></li>
+      </ul>
+    </li>
+    <li><a href="#performance">Performance</a>
+      <ul>
+        <li><a href="#mimallocbench">mimalloc‑bench</a></li>
+        <li><a href="#rpmallocbenchmark">rpmalloc‑benchmark</a></li>
+        <li><a href="#gpu-suballocation">GPU sub‑allocation</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#references">References</a></li>
+    <li><a href="#further-reading">Further reading</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="introduction">Introduction</h2>
+<p>Every C and C++ programmer knows the contract: <code>malloc(size)</code> returns a pointer, and <code>free(ptr)</code> takes it back. The size is missing from the second half, <code>free</code> gets only the pointer.</p>
+<p>In case you&rsquo;re unfamiliar with how allocators work there is a great short introduction video about it, you can watch it here:</p>
+<div align="center">
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">malloc() is lying to you.  Find out why, and how the illusion works! <a href="https://t.co/pUjYVEqBSD">pic.twitter.com/pUjYVEqBSD</a></p>&mdash; Dave W Plummer (@davepl1968) <a href="https://x.com/davepl1968/status/2055402203133997328?ref_src=twsrc%5Etfw">May 15, 2026</a></blockquote>
+<script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+
+
+</div>
+<p>Most people visualize allocation as something like this:</p>
+<p>You call <code>char* buffer = (char*)malloc(1);</code> and you get:</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 140" width="100%" style="max-width:760px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ahmm1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect x="140" y="20" width="160" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="220.0" y="47" text-anchor="middle" fill-opacity="0.5">…</text>
+<rect x="300" y="20" width="160" height="44" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.2"/>
+<text x="380.0" y="47" text-anchor="middle" font-weight="600">memory block, size 1</text>
+<rect x="460" y="20" width="160" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="540.0" y="47" text-anchor="middle" fill-opacity="0.5">…</text>
+<polyline points="300,112 300,67" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahmm1)"/>
+<text x="312" y="116"><tspan font-family="'Noto Sans Mono', monospace">buffer</tspan>, exactly 1 byte long</text>
+</svg>
+</div>
+<p>But actually it looks like this:</p>
+<div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 200" width="100%" style="max-width:760px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<defs><marker id="ahmm2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+<rect x="40" y="20" width="90" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="85.0" y="47" text-anchor="middle" fill-opacity="0.5">…</text>
+<rect x="130" y="20" width="150" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="205.0" y="47" text-anchor="middle">memory header</text>
+<rect x="280" y="20" width="220" height="44" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.2"/>
+<text x="390.0" y="47" text-anchor="middle" font-weight="600">your memory block</text>
+<rect x="500" y="20" width="150" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="575.0" y="47" text-anchor="middle">memory footer</text>
+<rect x="650" y="20" width="70" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="685.0" y="47" text-anchor="middle" fill-opacity="0.5">…</text>
+<polyline points="280,118 280,67" fill="none" stroke="currentColor" stroke-width="1.2" marker-end="url(#ahmm2)"/>
+<text x="292" y="100"><tspan font-family="'Noto Sans Mono', monospace">malloc(size)</tspan> returns a pointer to here,</text>
+<text x="292" y="117">and the block is usually larger than the size you asked for</text>
+<line x1="130" y1="64" x2="130" y2="150" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<line x1="650" y1="64" x2="650" y2="150" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<polyline points="130,142 130,150 650,150 650,142" fill="none" stroke="currentColor" stroke-width="1.2"/>
+<line x1="390" y1="150" x2="390" y2="160" stroke="currentColor" stroke-width="1.2"/>
+<text x="390" y="178" text-anchor="middle">memory block the allocator actually allocated</text>
+</svg>
+</div>
+<p>Memory header and footer are usually allocator metadata which is used for allocator operations, optionally some memory tracking, and some mechanism to detect memory errors. Memory footer is not common unless allocator has some memory corruption detection mechanisms.</p>
+<p>Memory header is usually where <code>malloc</code> stores the size of the block in order for <code>free(ptr)</code> to work. The allocator knew how much memory it handed out, the caller knew how much it asked for, but <code>free</code> gets only the pointer, so the allocator has to write the size down somewhere, usually in a header in front of the block, and find it again later. <code>std::allocator</code> passes the size back, but the rest is the same: an allocation is a bare pointer, and everything else about it, how big it really is, how it&rsquo;s aligned, who allocated it, lives somewhere else.</p>
+<p>In 2015 <a href="https://erdani.org/">Andrei Alexandrescu</a> proposed a different contract: an allocation is not a pointer, it&rsquo;s a block, the pointer and the size together. The allocator returns the block, the caller keeps it, and hands it back when it&rsquo;s done. Once allocators speak in blocks they can be small, do one thing, and be composed into larger ones.</p>
+<p>This post is about <code>bx::Blk</code>, an implementation of that idea taken further than the talk. The block also knows which allocator it came from, it can&rsquo;t be copied or freed twice by accident, when it&rsquo;s invalid it says why, and it describes GPU memory the same way it describes CPU memory. On top of it there is a set of composable allocators, allocation debugging, memory tracking and a general purpose heap.</p>
+<h2 id="history-of-composable-allocators">History of composable allocators</h2>
+<p>Composition came from C first. Kiem‑Phong Vo&rsquo;s <a href="https://manpages.opensuse.org/Tumbleweed/ksh-devel/vmalloc.3ast.en.html">Vmalloc</a> (1996) splits an allocator into a method, how blocks are handed out (<code>Vmbest</code>, <code>Vmpool</code>, <code>Vmlast</code>), and a discipline, where raw memory comes from (<code>Vmdcsystem</code> for <code>mmap</code>, <code>sbrk</code> or Win32). Any method works with any discipline, and debugging is just another method: <code>Vmdebug</code> checks for overruns and double frees, <code>Vmprofile</code> records usage.</p>
+<p>Emery Berger, Benjamin Zorn and Kathryn McKinley&rsquo;s <a href="https://github.com/emeryberger/Heap-Layers">Heap Layers</a> (PLDI 2001) brought it to C++. Each layer is a template that inherits from the layer below, and an allocator is a stack of layers. Composed allocators matched hand‑written ones, and Hoard and DieHard are built from it. The same year Andrei Alexandrescu&rsquo;s <em>Modern C++ Design</em> introduced policy‑based design, the mechanism his allocators would use fourteen years later, and Loki&rsquo;s small object allocator.</p>
+<p>Also in 2001, Jeff Bonwick and Jonathan Adams added <a href="https://www.usenix.org/legacy/event/usenix01/full_papers/bonwick/bonwick.pdf">magazines and vmem</a> to the Solaris slab allocator. Magazines are per‑CPU caches of free blocks. Vmem allocates arbitrary resources, ranges of integers, so it never touches what it manages.</p>
+<p>Game developers kept running into the limits of <code>std::allocator</code>. Paul Pedriana&rsquo;s <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2271.html">N2271</a> (2007) says <code>std::allocator</code> was the largest reason EA wrote EASTL.</p>
+<h3 id="alexandrescus-talk">Alexandrescu&rsquo;s talk</h3>
+<p>Alexandrescu presented composable allocators at CppCon 2015, in the &ldquo;std::allocator Is to Allocation what std::vector Is to Vexation&rdquo; talk:</p>
+<div align="center">
+<iframe width="640" height="480" src="https://www.youtube.com/embed/LIb3L4vKZ7U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+<p>In the talk he introduces two main ideas:</p>
+<ul>
+<li>
+<p>Allocation returns <code>Blk { void* ptr; size_t length; }</code>. The allocator says how much it gave, the caller keeps it and hands it back, and the allocator doesn&rsquo;t have to store the size.</p>
+</li>
+<li>
+<p>Allocators are small parts with the same interface, <code>allocate</code>, <code>deallocate</code>, <code>expand</code>, <code>reallocate</code> and <code>owns</code>, put together with templates. <code>FallbackAllocator&lt;Primary, Fallback&gt;</code> asks <code>Primary::owns</code> to decide who frees a block. <code>Segregator</code> splits by size, <code>Bucketizer</code> makes size classes, <code>AffixAllocator</code> adds a prefix or suffix for metadata, and <code>StatsCollector</code> counts.</p>
+</li>
+</ul>
+<p>Alexandrescu implemented the whole thing in D as <a href="https://dlang.org/phobos/std_experimental_allocator.html">std.experimental.allocator</a>, released with D 2.069 in November 2015, where a block is a <code>void[]</code> slice. It is the most complete implementation of the talk, and it is still in <code>experimental</code>.</p>
+<p>In C++ there are <a href="https://github.com/FelixPetriconi/AllocatorBuilder">AllocatorBuilder</a>, <a href="https://github.com/lukaszlaszko/allocators">allocators</a> and <a href="https://github.com/KredeGC/KTL">KTL</a>, which reproduce the building blocks from the talk, and <a href="https://foonathan.net/2016/11/memory-0.6/">foonathan/memory</a>, which passes <code>memory_block</code> between allocator layers and hands users plain pointers. The standard took one piece: <a href="https://wg21.link/p0401"><code>allocate_at_least</code></a> in C++23 returns <code>{ ptr, count }</code>.</p>
+<p>On the GPU side, AMD&rsquo;s <a href="https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/virtual_allocator.html">Vulkan Memory Allocator</a> and <a href="https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator">D3D12 Memory Allocator</a> have virtual blocks, and Sebastian Aaltonen&rsquo;s <a href="https://github.com/sebbbi/OffsetAllocator">OffsetAllocator</a> is TLSF for offsets. They hand out offsets into memory the CPU can&rsquo;t touch and keep metadata outside of it, each with its own API, separate from how the same program allocates CPU memory.</p>
+<h2 id="bxblk">bx::Blk</h2>
+<p>The <code>Blk</code> from the talk is two fields, <code>struct Blk { void* ptr; size_t length; }</code>, and it&rsquo;s a plain value. <code>bx::Blk</code> keeps the idea, the caller holds the block and hands it back, and changes almost everything else about it.</p>
+<h3 id="layout">Layout</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Blk</span>                            <span style="color:#75715e">// 24 bytes, 64-bit layout
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#75715e"></span>{
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span>    <span style="color:#66d9ef">uint64_t</span> ptr;                     <span style="color:#75715e">// pointer, or offset into GPU memory
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>    <span style="color:#66d9ef">uint64_t</span> size            : <span style="color:#ae81ff">40</span>;    <span style="color:#75715e">// size of block, up to 1TiB
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint64_t</span> log2Alignment   :  <span style="color:#ae81ff">5</span>;    <span style="color:#75715e">// alignment of block
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint64_t</span> cpuAccessible   :  <span style="color:#ae81ff">1</span>;    <span style="color:#75715e">// can CPU read and write this memory?
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint64_t</span> allocatorOp     :  <span style="color:#ae81ff">3</span>;    <span style="color:#75715e">// what the last operation did
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint64_t</span> allocatorHandle :  <span style="color:#ae81ff">8</span>;    <span style="color:#75715e">// which allocator returned the block
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>    <span style="color:#66d9ef">uint32_t</span> bookKeeping;             <span style="color:#75715e">// private data of the allocator
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint16_t</span> slotIndex;               <span style="color:#75715e">// routing inside of composed allocator
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint16_t</span> unused0;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>    <span style="color:#66d9ef">uint32_t</span> locationIdx;             <span style="color:#75715e">// only with memory tracking, 32 bytes
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">uint32_t</span> unused1;
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>};
+</span></span></code></pre></div><div align="center">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 226" width="100%" style="max-width:760px;height:auto" font-family="Noto, sans-serif" font-size="13" fill="currentColor">
+<text x="620" y="14" text-anchor="middle" font-size="11" fill-opacity="0.75">only with memory tracking</text>
+<text x="50" y="67" text-anchor="end" font-size="11" fill-opacity="0.75">bytes</text>
+<text x="50" y="157" text-anchor="end" font-size="11" fill-opacity="0.75">bits</text>
+<text x="60" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">0</text>
+<text x="220" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">8</text>
+<text x="380" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">16</text>
+<text x="460" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">20</text>
+<text x="500" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">22</text>
+<text x="540" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">24</text>
+<text x="620" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">28</text>
+<text x="700" y="33" text-anchor="middle" font-size="11" fill-opacity="0.75">32</text>
+<rect x="60" y="40" width="160" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="140" y="67" text-anchor="middle">ptr</text>
+<rect x="220" y="40" width="160" height="44" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.2"/>
+<text x="300" y="67" text-anchor="middle" font-weight="600">bit fields</text>
+<rect x="380" y="40" width="80" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="420" y="67" text-anchor="middle" font-size="12">bookKeeping</text>
+<rect x="460" y="40" width="40" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="480" y="60" text-anchor="middle" font-size="11">slot</text>
+<text x="480" y="73" text-anchor="middle" font-size="11">Index</text>
+<rect x="500" y="40" width="40" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="520" y="67" text-anchor="middle" font-size="11" fill-opacity="0.6">unused</text>
+<rect x="540" y="40" width="80" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="580" y="67" text-anchor="middle" font-size="12" fill-opacity="0.6">locationIdx</text>
+<rect x="620" y="40" width="80" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="660" y="67" text-anchor="middle" font-size="11" fill-opacity="0.6">unused</text>
+<line x1="220" y1="84" x2="60" y2="130" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<line x1="380" y1="84" x2="700" y2="130" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<rect x="60" y="130" width="400" height="44" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.2"/>
+<text x="260" y="157" text-anchor="middle" font-weight="600">size : 40</text>
+<rect x="460" y="130" width="50" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="485" y="157" text-anchor="middle">5</text>
+<rect x="510" y="130" width="10" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<rect x="520" y="130" width="30" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="535" y="157" text-anchor="middle">3</text>
+<rect x="550" y="130" width="80" height="44" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="1.2"/>
+<text x="590" y="157" text-anchor="middle">8</text>
+<rect x="630" y="130" width="70" height="44" fill="currentColor" fill-opacity="0.03" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.35" stroke-dasharray="4 4"/>
+<text x="665" y="157" text-anchor="middle" font-size="11" fill-opacity="0.6">unused</text>
+<line x1="485" y1="174" x2="485" y2="184" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+<text x="506" y="197" text-anchor="end" font-size="12">log2Alignment</text>
+<line x1="590" y1="174" x2="590" y2="184" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+<text x="544" y="197" font-size="12">allocatorHandle</text>
+<line x1="515" y1="174" x2="515" y2="204" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+<text x="521" y="217" text-anchor="end" font-size="12">cpuAccessible : 1</text>
+<line x1="535" y1="174" x2="535" y2="204" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+<text x="529" y="217" font-size="12">allocatorOp</text>
+</svg>
+</div>
+<p>What the fields are for, compared to pointer and length in the talk:</p>
+<ul>
+<li>
+<p><code>ptr</code> is 64 bits on every platform, including 32‑bit ones, because it&rsquo;s not always a pointer. For GPU memory it&rsquo;s an offset.</p>
+</li>
+<li>
+<p><code>size</code> is the size the allocator actually gave, which can be more than what was asked for.</p>
+</li>
+<li>
+<p><code>log2Alignment</code> is there because alignment is something the caller knows at allocation, and has to repeat on every resize and free. Now it&rsquo;s in the block.</p>
+</li>
+<li>
+<p><code>allocatorOp</code> says what happened to the block last: no‑operation, alias, allocate, free, grow, realign, or truncate. There is one entry point, <code>realloc(blk, size, alignment)</code>, and the caller can tell if the block grew in place or moved.</p>
+</li>
+<li>
+<p><code>allocatorHandle</code> is the allocator the block came from.</p>
+</li>
+<li>
+<p><code>bookKeeping</code> and <code>slotIndex</code> belong to allocators. Metadata that an allocator would write into a header in front of the memory can live in the block, which matters when the memory is on the GPU and there is nowhere to write the header.</p>
+</li>
+</ul>
+<h3 id="unique-pointer-without-automatic-release">Unique pointer without automatic release</h3>
+<p>This is the largest change in behavior. In the talk a block is a plain struct, and nothing stops this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>Blk a <span style="color:#f92672">=</span> allocator.allocate(<span style="color:#ae81ff">100</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>Blk b <span style="color:#f92672">=</span> a;               <span style="color:#75715e">// copy of metadata
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#75715e"></span>allocator.deallocate(a);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>allocator.deallocate(b); <span style="color:#75715e">// double free, and `b` looked completely valid
+</span></span></span></code></pre></div><p>The same happens when a block is resized and the old copy is kept around, the old copy has the wrong pointer or the wrong size, and it&rsquo;s the caller&rsquo;s job to never use it.</p>
+<p><code>bx::Blk</code> behaves like <code>std::unique_ptr</code>, there is always only one owner of the block:</p>
+<ul>
+<li>
+<p>It can&rsquo;t be copied, only moved, and moving invalidates the source.</p>
+</li>
+<li>
+<p>Every function that changes a block takes it as <code>Blk&amp;&amp;</code> and returns the result. The block that went in is invalid when the function returns. If a resize fails, the original block is what comes back, marked as no‑operation.</p>
+</li>
+<li>
+<p>It&rsquo;s <code>[[nodiscard]]</code>, the result can&rsquo;t be dropped on the floor.</p>
+</li>
+</ul>
+<p>In code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>bx<span style="color:#f92672">::</span>Blk blk <span style="color:#f92672">=</span> bx<span style="color:#f92672">::</span>alloc(allocator, <span style="color:#ae81ff">100</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>blk <span style="color:#f92672">=</span> bx<span style="color:#f92672">::</span>realloc(bx<span style="color:#f92672">::</span>move(blk), <span style="color:#ae81ff">200</span>); <span style="color:#75715e">// old block is gone, there is only
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span><span style="color:#75715e"></span>                                       <span style="color:#75715e">// the new one
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#75715e"></span>blk <span style="color:#f92672">=</span> bx<span style="color:#f92672">::</span>free(bx<span style="color:#f92672">::</span>move(blk) );        <span style="color:#75715e">// `blk` is now invalid, reason: freed
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>bx<span style="color:#f92672">::</span>Blk copy <span style="color:#f92672">=</span> blk;                    <span style="color:#75715e">// doesn&#39;t compile
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span><span style="color:#75715e"></span>bx<span style="color:#f92672">::</span>free(blk);                         <span style="color:#75715e">// doesn&#39;t compile
+</span></span></span></code></pre></div><p>Unlike <code>std::unique_ptr</code>, <code>Blk</code> doesn&rsquo;t free memory when it goes out of scope. Allocation and release stay explicit, there are no frees hidden behind a closing brace, and without a destructor <code>Blk</code> is trivially relocatable, 24 bytes that containers and allocators can move around with <code>memcpy</code>. What <code>unique_ptr</code> gives for free at scope exit is done by containers that own a block: <code>ArrayT</code>, <code>HashMapT</code>, <code>UniquePtrT</code>.</p>
+<p>Forgetting to free is caught another way. With memory tracking turned on, <code>Blk</code> gets a destructor that doesn&rsquo;t free, it asserts if the block that&rsquo;s going away still owns memory, and reports where that block was allocated. A leak is reported at the place where the block is lost, not as a list of leaked pointers at exit.</p>
+<p>When more than one piece of code needs to look at the same block, the copy has to be asked for: <code>Blk(Copy, blk)</code> makes a non‑owning alias. It&rsquo;s marked as <code>AllocatorOp::Alias</code>, it can&rsquo;t be resized or freed, and it&rsquo;s not counted as a leak.</p>
+<p>Memory tracking changes the size of <code>Blk</code>, so <code>Blk</code> lives in an inline namespace named after <code>BX_CONFIG_MEMORY_TRACKING</code>. Code built with tracking and code built without it doesn&rsquo;t link, instead of crashing at runtime.</p>
+<h3 id="the-block-knows-its-allocator">The block knows its allocator</h3>
+<p>In the talk the allocator is not part of the block. The caller has to remember which allocator a block came from, and composed allocators find the owner by asking each part <code>owns(blk)</code>.</p>
+<p><code>bx::Blk</code> carries an 8‑bit handle of the allocator that returned it. <code>free(blk)</code> and <code>realloc(blk, ...)</code> don&rsquo;t take an allocator argument, there is no header in front of the memory, and no lookup by address.</p>
+<p>The handle is 8 bits because it has to fit into the block next to the size and alignment, and that makes 256 handles. A handle is an index into a table of allocators, so getting from a block to its allocator is one read from an array. Allocators get a handle when they&rsquo;re created, and handle 0 is the process default, which is the heap until it&rsquo;s set to something else with <code>setDefaultAllocatorBlk</code>.</p>
+<p>256 sounds small, but handles are for allocators, not for allocations, and a program has few allocators. The whole bx heap takes about 12. The limit is also on allocators that are alive at the same time, not on how many are created: when an allocator is destroyed its handle is released, and released handles are reused in turn. Running out of handles is an assert, and code that creates and destroys allocators all the time should reset them instead.</p>
+<p>Reuse of handles is why an allocator has to outlive every block it returned. A block that is still around after its allocator is gone carries a handle that sooner or later belongs to another allocator. With memory tracking, destroying an allocator that has live blocks is an assert.</p>
+<p>Some allocators are never destroyed, they live as long as the process. Those can be marked with <code>setAllocatorPermanent</code>, and a permanent handle is never given to another allocator. That handle means the same allocator for as long as the process runs, so the pointer to the allocator can be cached instead of looked up. The heap marks its own allocators as permanent. The default handle is not permanent, because it can be pointed at another allocator.</p>
+<p>Containers get smaller because of it. They take a one byte <code>AllocatorHandle</code> instead of an allocator pointer, and <code>ArrayT</code> or <code>UniquePtrT</code> store nothing but their <code>Blk</code>.</p>
+<h3 id="invalid-blocks-say-why">Invalid blocks say why</h3>
+<p>A null pointer says that something failed. An invalid <code>Blk</code> says what: allocation failed, no block large enough (but smaller ones are available), resize failed, realign failed, not supported, or the block was freed. A block that was freed is distinguishable from one that was never allocated.</p>
+<h3 id="one-entry-point">One entry point</h3>
+<p>The allocator interface in the talk has <code>allocate</code>, <code>deallocate</code>, <code>reallocate</code> and <code>expand</code>. A bx allocator has one function, <code>realloc(blk, size, alignment)</code>. An invalid block going in is an allocation, size 0 is a free, anything else is a resize, and <code>allocatorOp</code> in the block that comes back says which one happened.</p>
+<p>The functions users call are built on top of it, and each comes in three forms:</p>
+<ul>
+<li>
+<p><code>tryAlloc</code>, <code>tryRealloc</code> report failure through <code>Error*</code>, and the caller has to deal with it.</p>
+</li>
+<li>
+<p><code>alloc</code>, <code>realloc</code>, <code>free</code> stop on failure.</p>
+</li>
+<li>
+<p><code>Unchecked</code> variants skip the checks, for hot paths where the caller guarantees the preconditions.</p>
+</li>
+</ul>
+<p>Not all code can hold a 24 byte block. For code that can only keep a pointer there are <code>allocPtr</code>, <code>reallocPtr</code>, <code>freePtr</code> and <code>BX_NEW_PTR</code>/<code>deletePtr</code>, which store the <code>Blk</code> in a header in front of the pointer. It&rsquo;s what <code>malloc</code> does, but only where it&rsquo;s asked for.</p>
+<p>Block allocators and old pointer based <code>AllocatorI</code> can&rsquo;t be confused. Passing one where the other is expected doesn&rsquo;t compile.</p>
+<h3 id="allocators">Allocators</h3>
+<p>Allocators are plain classes without virtual functions, composed with templates, so the calls between the parts inline. The parts:</p>
+<ul>
+<li>
+<p><strong>Memory sources.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L918-L919"><code>SystemMemoryAllocator</code></a> takes pages from the operating system. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L965-L971"><code>PageReserveAllocator</code></a> reserves address space for each block and commits pages as the block grows, so the block grows in place and never moves. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L97-L103"><code>FixedCapacityAllocatorT</code></a> hands out one block from inline storage.</p>
+</li>
+<li>
+<p><strong>Managing a region.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L262-L268"><code>FirstFitAllocatorT</code></a>, <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L375-L386"><code>BitArrayAllocatorT</code></a> and <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L758-L764"><code>TwoLevelSegregatedFitAllocatorT</code></a> (TLSF) for general use. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L461-L470"><code>FrameRingAllocatorT</code></a> for transient per‑frame allocations with multiple frames in flight, <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L574-L581"><code>DoubleEndedStackAllocatorT</code></a> for a stack that grows from both ends.</p>
+</li>
+<li>
+<p><strong>Composition.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L188-L196"><code>ThresholdAllocatorT</code></a> sends blocks up to a size to one allocator and the rest to another, it&rsquo;s the segregator from the talk. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L141-L147"><code>OverflowAllocatorT</code></a> uses the secondary allocator when the primary is out of memory, the talk&rsquo;s fallback. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L1332-L1338"><code>MoreCoreAllocatorT</code></a> takes memory from the secondary and adds it to the primary instead.</p>
+</li>
+<li>
+<p><strong>Threads.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L1402-L1407"><code>MutexAllocatorT</code></a> puts a lock around any allocator. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L1462-L1472"><code>ThreadLocalAllocatorT</code></a> gives each thread its own instance, and blocks can be freed on any thread. <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L1563-L1576"><code>ThreadCacheAllocatorT</code></a> adds a per‑thread cache of small blocks, with Bonwick&rsquo;s magazines.</p>
+</li>
+<li>
+<p><strong>Sensitive data.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L50-L55"><code>SecureAllocatorT</code></a> wraps any allocator and clears the memory of freed and resized blocks, so keys and passwords don&rsquo;t stay behind in memory that was given back.</p>
+</li>
+<li>
+<p><strong>Adapters.</strong> <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk.h#L782-L787"><code>ImplementAllocatorBlkInterfaceT</code></a> puts any of them behind the virtual <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk.h#L363-L365"><code>AllocatorBlkI</code></a> when a block allocator has to cross an API boundary, and <a href="https://github.com/bkaradzic/bx/blob/93ab098066e57718fb80acc1987a48ccf91df392/include/bx/blk-allocators.h#L1128-L1133"><code>IntrusiveBlkAllocatorT</code></a> exposes a block allocator as the old pointer based <code>AllocatorI</code>.</p>
+</li>
+</ul>
+<p>First fit and TLSF don&rsquo;t own the memory they manage. Memory is added to them and removed from them as slabs (<code>addSlab</code>, <code>removeUnusedSlab</code>), and that is the same interface whether the slab is RAM or a GPU heap.</p>
+<h3 id="cpu-and-gpu-memory">CPU and GPU memory</h3>
+<p>In the talk a block is CPU memory, <code>void*</code>, and allocators are free to write into memory they manage. In <code>bx::Blk</code> the <code>cpuAccessible</code> bit says if <code>ptr</code> can be dereferenced. When it can&rsquo;t, <code>ptr</code> is an offset, allocators keep all metadata outside of the memory, and debug features that touch memory are skipped.</p>
+<p>That&rsquo;s all it takes for the same allocators and the same composition to work on both. TLSF, first fit, or frame ring sub‑allocate a GPU heap the same way they sub‑allocate RAM. bgfx does exactly this:</p>
+<ul>
+<li>
+<p>D3D12 and Vulkan renderers have one <code>TwoLevelSegregatedFitAllocatorT</code> per kind of memory. Each <code>ID3D12Heap</code> or <code>VkDeviceMemory</code> is added as a slab the CPU can&rsquo;t access, with the index of the heap in the upper bits of <code>ptr</code>. Heaps that are no longer used are removed and given back to the driver.</p>
+</li>
+<li>
+<p>Dynamic vertex and index buffers are ranges of a larger GPU buffer, handed out by <code>FirstFitAllocatorT</code>, not TLSF. It&rsquo;s a different allocator behind the same slab interface, each GPU buffer is added as a slab.</p>
+</li>
+</ul>
+<p>This is how a <code>VkDeviceMemory</code> goes in and an allocation comes out in bgfx&rsquo;s Vulkan renderer, simplified:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#75715e">// Device memory is added as a slab. Index of the slab is in the upper 32 bits
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span><span style="color:#75715e">// of `ptr`, and the block is marked as not accessible by the CPU.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#75715e"></span>allocator.addSlab(
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>      bx<span style="color:#f92672">::</span>Blk(<span style="color:#66d9ef">uint64_t</span>(slabIdx <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">32</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>    , size
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>    , <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>    , false
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>    , bx<span style="color:#f92672">::</span>AllocatorOp<span style="color:#f92672">::</span>Allocate
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>    ) );
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span><span style="color:#75715e">// Allocation is a block. Which device memory, and the offset into it,
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span><span style="color:#75715e">// are both in `ptr`.
+</span></span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span><span style="color:#75715e"></span>bx<span style="color:#f92672">::</span>Blk blk <span style="color:#f92672">=</span> allocator.alloc(requirements.size, requirements.alignment);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">uint16_t</span> slabIdx <span style="color:#f92672">=</span> <span style="color:#66d9ef">uint16_t</span>( (blk.ptr <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">32</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">uint32_t</span> offset  <span style="color:#f92672">=</span> <span style="color:#66d9ef">uint32_t</span>(blk.ptr);
+</span></span></code></pre></div><p>Nothing is written into the device memory, what TLSF needs to free the block later is in the block&rsquo;s <code>bookKeeping</code>.</p>
+<h3 id="memory-tracking-and-debugging">Memory tracking and debugging</h3>
+<p>With <code>BX_CONFIG_MEMORY_TRACKING</code> every allocation records where in the source it was made. The location is a defaulted argument of <code>alloc</code>, like <code>std::source_location</code>, so there are no macros at call sites. Each location keeps the number of live blocks and bytes, their peaks, the number of operations, and the call stack of the first allocation from it, and all locations can be enumerated at any time. The block points to its location, which is how the leak assert in <code>~Blk</code> knows what to report. With tracking compiled out <code>Blk</code> goes back to 24 bytes with no destructor.</p>
+<p>Debugging tools are allocators too, and they&rsquo;re added by composition, around any allocator and at any level:</p>
+<ul>
+<li>
+<p><code>StatsAllocatorT</code> counts bytes, blocks and operations, and is thread safe.</p>
+</li>
+<li>
+<p><code>DebugClearAllocatorT</code> fills new memory with <code>0xcd</code> and freed memory with <code>0xdd</code>.</p>
+</li>
+<li>
+<p><code>DebugStompAllocator</code> places each block against a guard page, after the block to catch overruns or before it to catch underruns, so out of bounds access and use after free trap at the instruction that did it (see <a href="https://web.archive.org/web/20251020214341/https://irradiance.ca/posts/stomp/">Memory Stomp Allocator</a>).</p>
+</li>
+</ul>
+<h3 id="general-purpose-heap-from-the-same-parts">General purpose heap from the same parts</h3>
+<p><code>bx::malloc</code>, <code>realloc</code>, <code>alignedAlloc</code>, <code>free</code> and <code>usableSize</code> run on a heap composed from the same block allocators. It&rsquo;s a test of the whole idea: if composition from blocks had a cost, this is where it would show.</p>
+<p>The heap has three modes, picked with <code>setHeap</code>:</p>
+<ul>
+<li>
+<p><strong>Throughput.</strong> Threads own their pages.</p>
+</li>
+<li>
+<p><strong>Footprint.</strong> Threads share pages, and thread caches are bounded.</p>
+</li>
+<li>
+<p><strong>Balanced</strong>, the default. Blocks up to 8KiB come from pages owned by the thread, larger ones from shared pages.</p>
+</li>
+</ul>
+<p>Where the heap gets its memory from is also an allocator, set with <code>setHeapUpstream</code>.</p>
+<h2 id="performance">Performance</h2>
+<p>All bx results below are from the balanced heap, which is the default. The throughput and footprint modes are not represented.</p>
+<h3 id="mimallocbench">mimalloc‑bench</h3>
+<p><a href="https://github.com/daanx/mimalloc-bench">mimalloc‑bench</a> is the benchmark that matters the most, because it&rsquo;s based on reality. It runs real, familiar open source programs, redis, rocksdb, lean, espresso, cfrac, a Linux kernel build, next to the allocator stress tests, with each allocator loaded as the <code>malloc</code> of the process.</p>
+<p>For each test an allocator gets the best result divided by its own, and the score is the geometric mean over all tests times 100, so 100 means the best on every test. Overall is time and memory weighted equally:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">allocator</th>
+<th style="text-align:right">time</th>
+<th style="text-align:right">memory</th>
+<th style="text-align:right">overall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">mimalloc 1.8.2</td>
+<td style="text-align:right">90.0</td>
+<td style="text-align:right">82.0</td>
+<td style="text-align:right">85.9</td>
+</tr>
+<tr>
+<td style="text-align:left">snmalloc 0.7.6</td>
+<td style="text-align:right">90.0</td>
+<td style="text-align:right">69.8</td>
+<td style="text-align:right">79.2</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>bx</strong></td>
+<td style="text-align:right"><strong>83.9</strong></td>
+<td style="text-align:right"><strong>74.7</strong></td>
+<td style="text-align:right"><strong>79.2</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">rpmalloc 2.0.1</td>
+<td style="text-align:right">82.9</td>
+<td style="text-align:right">70.9</td>
+<td style="text-align:right">76.7</td>
+</tr>
+<tr>
+<td style="text-align:left">mimalloc 2.1.2</td>
+<td style="text-align:right">84.5</td>
+<td style="text-align:right">68.1</td>
+<td style="text-align:right">75.9</td>
+</tr>
+<tr>
+<td style="text-align:left">glibc 2.39</td>
+<td style="text-align:right">61.4</td>
+<td style="text-align:right">81.2</td>
+<td style="text-align:right">70.6</td>
+</tr>
+<tr>
+<td style="text-align:left">jemalloc 5.4.0</td>
+<td style="text-align:right">77.1</td>
+<td style="text-align:right">61.7</td>
+<td style="text-align:right">69.0</td>
+</tr>
+<tr>
+<td style="text-align:left">mimalloc 3.6.0</td>
+<td style="text-align:right">87.2</td>
+<td style="text-align:right">45.8</td>
+<td style="text-align:right">63.2</td>
+</tr>
+<tr>
+<td style="text-align:left">tcmalloc (gperftools 2.18)</td>
+<td style="text-align:right">67.1</td>
+<td style="text-align:right">55.7</td>
+<td style="text-align:right">61.1</td>
+</tr>
+</tbody>
+</table>
+<p>bx is in the leading group. It&rsquo;s 1.37x faster than glibc, about 7% behind mimalloc 1.8 and snmalloc, about even with mimalloc 2 and 3 and rpmalloc, and ahead of jemalloc and tcmalloc. Only glibc and mimalloc 1.8 use less memory overall. It ties for the fastest on the kernel build, and trails the most on small block churn, where sh6bench is about 2x behind the fastest.</p>
+<h3 id="rpmallocbenchmark">rpmalloc‑benchmark</h3>
+<p><a href="https://github.com/mjansson/rpmalloc-benchmark">rpmalloc‑benchmark</a> is synthetic. Threads do nothing but allocate and free blocks of random sizes, and hand some of them to other threads to free. A program that only allocates doesn&rsquo;t exist, so the differences it shows are much larger than what a real program would see, and it should be read as a stress test of the allocator and not as a prediction. It&rsquo;s useful for comparing against platform allocators, because it runs everywhere. Three ranges of block sizes at 1, 4 and 8 threads:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">platform</th>
+<th style="text-align:left">platform allocator</th>
+<th style="text-align:right">bx is faster by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Windows, Ryzen 9 7950X</td>
+<td style="text-align:left">Windows heap</td>
+<td style="text-align:right">1.6–54x</td>
+</tr>
+<tr>
+<td style="text-align:left">Linux, i9‑9900K</td>
+<td style="text-align:left">glibc 2.39</td>
+<td style="text-align:right">2.6–4.7x</td>
+</tr>
+<tr>
+<td style="text-align:left">macOS, Apple M4</td>
+<td style="text-align:left">libmalloc</td>
+<td style="text-align:right">3.1–9.1x</td>
+</tr>
+<tr>
+<td style="text-align:left">iPhone 16e, A18</td>
+<td style="text-align:left">libmalloc</td>
+<td style="text-align:right">4.2–8.5x</td>
+</tr>
+<tr>
+<td style="text-align:left">iPhone 17 Pro Max, A19 Pro</td>
+<td style="text-align:left">libmalloc</td>
+<td style="text-align:right">3.6–15x</td>
+</tr>
+<tr>
+<td style="text-align:left">Pixel 9a, Tensor G4</td>
+<td style="text-align:left">Scudo</td>
+<td style="text-align:right">3.9–77x</td>
+</tr>
+</tbody>
+</table>
+<p>Peak memory is close to even, except on Linux where glibc uses 4–14% less. Against the other allocators on Windows, scored the same way as above, bx gets 90.5 for speed and 86.8 for memory, rpmalloc 75.5 and 70.7, mimalloc 60.0 and 83.7, snmalloc 57.0 and 79.8, tcmalloc 48.8 and 69.5.</p>
+<h3 id="gpu-suballocation">GPU sub‑allocation</h3>
+<p>bx allocators against <a href="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator">Vulkan Memory Allocator</a> and <a href="https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator">D3D12 Memory Allocator</a>, both as virtual blocks over a 256MiB virtual heap, with three workloads: churn of live blocks, transient blocks of one frame, and three frames in flight. For 256 allocations and 256 frees of each, bx TLSF, the one bgfx uses, takes 25.6µs in total, VMA 32.1µs and D3D12MA 31.4µs.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Blocks are not new, composable allocators are not new, and neither is any single allocator described here. Blocks with a size come from Alexandrescu&rsquo;s talk, composition from Vmalloc and Heap Layers, and TLSF, magazines and GPU sub‑allocators all existed before. What is <strong>novel</strong> is what <code>bx::Blk</code> does with the block. As far as I know, no other implementation makes the block the single owner of its memory, puts the allocator into the block, or manages CPU and GPU memory with the same blocks and the same allocators, and none has built a general purpose <code>malloc</code> replacement out of blocks.</p>
+<p>None of this is paid for with performance. On real programs the general purpose heap composed from these parts is in the same group as allocators that do nothing else, and 1.37x faster than glibc.</p>
+<p>It&rsquo;s not an experiment. It landed in <a href="https://github.com/bkaradzic/bx/pull/501">bx</a>, and bgfx&rsquo;s D3D12 and Vulkan renderers sub‑allocate GPU memory with the same allocators.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>
+<p>Andrei Alexandrescu, std::allocator Is to Allocation what std::vector Is to Vexation, CppCon 2015.<br>
+<a href="https://web.archive.org/web/20151016001552/https://www.youtube.com/watch?v=LIb3L4vKZ7U">https://web.archive.org/web/20151016001552/https://www.youtube.com/watch?v=LIb3L4vKZ7U</a></p>
+</li>
+<li>
+<p>Emery Berger, Benjamin Zorn, Kathryn McKinley, Composing High-Performance Memory Allocators, PLDI 2001.<br>
+<a href="https://web.archive.org/web/20260105020355/https://people.cs.umass.edu/~emery/pubs/berger-pldi2001.pdf">https://web.archive.org/web/20260105020355/https://people.cs.umass.edu/~emery/pubs/berger-pldi2001.pdf</a></p>
+</li>
+<li>
+<p>Jeff Bonwick, Jonathan Adams, Magazines and Vmem: Extending the Slab Allocator to Many CPUs and Arbitrary Resources, USENIX 2001.<br>
+<a href="https://web.archive.org/web/20160523065206/https://www.usenix.org/legacy/event/usenix01/full_papers/bonwick/bonwick.pdf">https://web.archive.org/web/20160523065206/https://www.usenix.org/legacy/event/usenix01/full_papers/bonwick/bonwick.pdf</a></p>
+</li>
+<li>
+<p>Miguel Masmano et al., TLSF: a New Dynamic Memory Allocator for Real-Time Systems, ECRTS 2004.<br>
+<a href="https://web.archive.org/web/20230512151610/http://www.gii.upv.es/tlsf/files/ecrts04_tlsf.pdf">https://web.archive.org/web/20230512151610/http://www.gii.upv.es/tlsf/files/ecrts04_tlsf.pdf</a></p>
+</li>
+</ul>
+<h2 id="further-reading">Further reading</h2>
+<ul>
+<li>
+<p>Memory Allocation<br>
+<a href="https://web.archive.org/web/20231127094923/https://samwho.dev/memory-allocation/">https://web.archive.org/web/20231127094923/https://samwho.dev/memory-allocation/</a></p>
+</li>
+<li>
+<p>Storing data in pointers<br>
+<a href="https://web.archive.org/web/20231127202929/https://muxup.com/2023q4/storing-data-in-pointers">https://web.archive.org/web/20231127202929/https://muxup.com/2023q4/storing-data-in-pointers</a></p>
+</li>
+<li>
+<p>Visual overview of a custom malloc() implementation<br>
+<a href="https://web.archive.org/web/20240206233435/https://silent-tower.net/projects/visual-overview-malloc">https://web.archive.org/web/20240206233435/https://silent-tower.net/projects/visual-overview-malloc</a></p>
+</li>
+<li>
+<p>How much memory does a call to ‘malloc’ allocates?<br>
+<a href="https://web.archive.org/web/20240627234824/https://lemire.me/blog/2024/06/27/how-much-memory-does-a-call-to-malloc-allocates/">https://web.archive.org/web/20240627234824/https://lemire.me/blog/2024/06/27/how-much-memory-does-a-call-to-malloc-allocates/</a></p>
+</li>
+<li>
+<p>A look at how malloc works on the Mac<br>
+<a href="https://web.archive.org/web/20231209160855/https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html">https://web.archive.org/web/20231209160855/https://www.cocoawithlove.com/2010/05/look-at-how-malloc-works-on-mac.html</a></p>
+</li>
+<li>
+<p>Memory Management Reference<br>
+<a href="https://web.archive.org/web/20180106220126/https://www.memorymanagement.org/index.html">https://web.archive.org/web/20180106220126/https://www.memorymanagement.org/index.html</a></p>
+</li>
+<li>
+<p>Writing a Memory Allocator<br>
+<a href="https://web.archive.org/web/20191118033431/http://dmitrysoshnikov.com/compilers/writing-a-memory-allocator/">https://web.archive.org/web/20191118033431/http://dmitrysoshnikov.com/compilers/writing-a-memory-allocator/</a></p>
+</li>
+<li>
+<p>On programming without malloc<br>
+<a href="https://web.archive.org/web/20131204182051/https://jvns.ca/blog/2013/12/03/day-36-programming-without-malloc/">https://web.archive.org/web/20131204182051/https://jvns.ca/blog/2013/12/03/day-36-programming-without-malloc/</a></p>
+</li>
+<li>
+<p>Memory Corruption: Finding and Fixing Elusive Crashes<br>
+<a href="https://web.archive.org/web/20201108133942/https://www.unrealengine.com/en-US/blog/memory-corruption-finding-and-fixing-elusive-crashes">https://web.archive.org/web/20201108133942/https://www.unrealengine.com/en-US/blog/memory-corruption-finding-and-fixing-elusive-crashes</a></p>
+</li>
+<li>
+<p>Memory Stomp Allocator<br>
+<a href="https://web.archive.org/web/20251020214341/https://irradiance.ca/posts/stomp/">https://web.archive.org/web/20251020214341/https://irradiance.ca/posts/stomp/</a></p>
+</li>
+<li>
+<p>Writing Your Own Memory Allocators in C++<br>
+<a href="https://web.archive.org/web/20240522015807/https://screwjankgames.github.io/engine%20programming/2020/09/24/writing-your-own-memory-allocators.html">https://web.archive.org/web/20240522015807/https://screwjankgames.github.io/engine%20programming/2020/09/24/writing-your-own-memory-allocators.html</a></p>
+</li>
+<li>
+<p>The Arena - Custom Memory Allocators in C<br>
+<a href="https://web.archive.org/web/20240423030055/https://www.bytesbeneath.com/p/the-arena-custom-memory-allocators">https://web.archive.org/web/20240423030055/https://www.bytesbeneath.com/p/the-arena-custom-memory-allocators</a></p>
+</li>
+<li>
+<p>malloc() from Scratch<br>
+<a href="https://web.archive.org/web/20251124060603/https://medium.com/@tenzinmigmar/malloc-from-scratch-dbc1bc23dfde">https://web.archive.org/web/20251124060603/https://medium.com/@tenzinmigmar/malloc-from-scratch-dbc1bc23dfde</a></p>
+</li>
+<li>
+<p>Memory Allocation Strategies, series of 6 articles<br>
+<a href="https://web.archive.org/web/20260711111540/https://www.gingerbill.org/series/memory-allocation-strategies/">https://web.archive.org/web/20260711111540/https://www.gingerbill.org/series/memory-allocation-strategies/</a></p>
+</li>
+</ul>
+
+            </div>
+            </br>
+            <div style="background: #f0f0ff; color: #000; padding: 20px 50px; padding-right: 50px; border-radius: 10px;">
+                <p>
+                <p>
+                <svg viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg><strong style="color: #000;"> - One more thing...</strong>
+                </p>
+                <p></br>
+                My mission with bgfx is to empower game developers by providing a cross-platform,
+                graphics API-agnostic rendering library that simplifies porting games across diverse platforms,
+                ensuring seamless performance and compatibility without engine lock-in.</br>
+                </br>
+                If you like this article and support my mission please consider becoming a <b><a href="https://github.com/sponsors/bkaradzic">sponsor</a></b>! ❤️
+                </p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/bkaradzic" target="_blank" rel="noopener noreferrer me"
+    title="X">
+    <svg viewBox="0 0 1200 1227" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"/>
+</svg>
+</a>
+<a href="https://www.youtube.com/@%D0%91%D1%80%D0%B0%D0%BD%D0%B8%D0%BC%D0%B8%D1%80%D0%9A%D0%B0%D1%80%D0%B0%D1%9F%D0%B8%D1%9B/videos" target="_blank" rel="noopener noreferrer me"
+    title="Youtube">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+    </path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+</svg>
+</a>
+<a href="/index.xml" target="_blank" rel="noopener noreferrer me"
+    title="Rss">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2011-2026 Branimir Karadžić.</br>
+        All content <a href="https://github.com/bkaradzic/bkaradzic.github.io/blob/master/LICENSE">CC BY-SA 4.0</a> Attribution-ShareAlike 4.0 International.</br>
+        Powered by <a href="https://github.com/hugo-sid/hugo-blog-awesome" target="_blank" rel="noopener">Hugo blog awesome</a>.</br>
+        <a href="https://visitorbadge.io/status?path=https%3A%2F%2Fbkaradzic.github.io"><img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fbkaradzic.github.io&countColor=%23263759&style=plastic&labelStyle=lower" /></a>
+    </small>
+</footer><a href="#" title="Go to top" id="totop">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" stroke="currentColor" viewBox="0 96 960 960">
+    <path d="M283 704.739 234.261 656 480 410.261 725.739 656 677 704.739l-197-197-197 197Z"/>
+</svg>
+
+</a>
+
+
+    
+
+
+
+
+
+
+    
+    <script src="https://bkaradzic.github.io/js/main.min.35f435a5d8eac613c52daa28d8af544a4512337d3e95236e4a4978417b8dcb2f.js" integrity="sha256-NfQ1pdjqxhPFLaoo2K9USkUSM30&#43;lSNuSkl4QXuNyy8="></script>
+
+    
+
+</body>
+</html>
